@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_margin="20dp"
+        android:text="로그인하기"
+        android:textSize="25sp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="30dp"
+        android:orientation="horizontal">
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="90dp"
+            android:orientation="vertical">
+
+            <EditText
+                android:id="@+id/edittext01"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:hint="아이디"
+                android:inputType="text"
+                android:singleLine="true" />
+
+            <EditText
+                android:id="@+id/edittext02"
+                android:layout_width="200dp"
+                android:layout_height="wrap_content"
+                android:hint="비밀번호"
+                android:inputType="textPassword"
+                android:singleLine="true" />
+
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/button_login"
+            android:layout_width="wrap_content"
+            android:layout_height="90dp"
+            android:text="로그인" />
+
+    </LinearLayout>
+</LinearLayout>

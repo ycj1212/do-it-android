@@ -264,3 +264,79 @@ MIME 타입?
 - 컴포넌트(Component)
 - 부가 데이터(Extras)
 
+### 플래그
+
+인텐트로 인해 동일한 액티비티를 여러 번 사용하게 되는 경우를 방지
+
+FLAG_ACTIVITY_SINGLE_TOP  
+FLAG_ACTIVITY_NO_HISTORY  
+FLAG_ACTIVITY_CLEAR_TOP  
+
+#### 인텐트를 처리 방법
+
+- 액티비티가 새로 만들어지는 경우  
+onCreate() {
+    getIntent()
+}  
+
+- 액티비티가 재사용되는 경우  
+onNewIntent(Intent intent)
+
+### 부가데이터
+
+인텐트 안에는 번들 객체가 들어있음  
+번들 객체는 해시테이블과 유사
+
+putExtra()  
+getStringExtra()  
+
+전달하고 싶은 데이터가 객체 자료형인 경우 객체 자체를 전달할 수 없음  
+객체 데이터는 바이트 배열로 변환하거나 Serializable 인터페이스를 구현하는 객체를 만들어 직렬화한 다음 전달해야함  
+안드로이드는 Serializable 인터페이스와 유사한 Parcelable 인터페이스 권장  
+직렬화했을 때 크기가 더 작기 때문
+
+
+public abstract int describeContents()  
+직렬화하려는 객체의 유형을 구분할 때 사용  
+
+public abstract void writeToParcel(Parcel dest, int flags)  
+객체가 가지고 있는 데이터를 Parcel 객체로 만듦
+
+### 태스크
+
+태스크는 앱이 어떻게 동작할 지 결정하는데 사용된다.  
+즉, 태스크를 이용하면 프로세스처럼 독립적인 실행 단위와 상관없이 어떤 화면들이 같이 동작해야 하는지 흐름을 관리할 수 있다.  
+프로세스는 독립적으로 실행됨  
+
+```xml
+<activity android:name=".MainActivity"
+        android:launchMode="singleTop">
+    <intent-filter>
+        <action android:name="android.intent.action.MAIN" />
+        <category android:name="android.intent.category.LAUNCHER" />
+    </intent-filter>
+</activity>
+```
+
+### 액티비티의 수명주기
+
+#### 액티비티의 대표적인 상태 정보
+
+상태 | 설명
+-|-
+실행(Running) | 화면상에 액티비티가 보이면서 실행되어 있는 상태. 액티비티 스택의 최상위에 있으며 포커스를 가지고 있음
+일시정지(Paused) | 사용자에게 보이지만 다른 액티비티가 위에 있어 포커스를 받지 못하는 상태. 대화상자가 위에 있어 일부가 가려진 경우에 해당함.
+중지(Stopped) | 다른 액티비티에 의해 완전히 가려저 보이지 않는 상태
+
+액티비티의 상태 정보가 변화하는 것을 액티비티의 수명주기(Life Cycle) 또는 생명주기라고 함.
+
+onCreate()  
+onStart()  
+onResume()  
+onRestart()  
+onPause()  
+onStop()  
+onDestroy()  
+
+onSaveInstanceState()  
+onRestoreInstanceState()  
