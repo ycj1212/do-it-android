@@ -330,13 +330,52 @@ public abstract void writeToParcel(Parcel dest, int flags)
 
 액티비티의 상태 정보가 변화하는 것을 액티비티의 수명주기(Life Cycle) 또는 생명주기라고 함.
 
-onCreate()  
-onStart()  
-onResume()  
-onRestart()  
-onPause()  
-onStop()  
-onDestroy()  
+- 액티비티 처음 실행 시  
+onCreate() -> onStart() -> onResume()
+
+- 액티비티 전환 시(A -> B)  
+A: onPause() -> onStop() -> (finish()) onDestroy()  
+B: onRestart() -> onStart() -> onResume()
 
 onSaveInstanceState()  
 onRestoreInstanceState()  
+
+### 프래그먼트
+
+- 화면의 일부분 구성
+
+사용 목적
+- 분할된 화면들을 독립적으로 구성
+- 분할된 화면들의 상태를 관리
+
+프래그먼트는 항상 액티비티 위에 올라가있어야 함
+
+[Fragment]
+
+public final Activity getActivity()  
+: 이 프래그먼트를 포함하는 액티비티 반환
+
+public final FragmentManager getFragmentManager()  
+: 이 프래그먼트를 포함하는 액티비티에서 프래그먼트 객체들과 의사소통하는 프래그먼트 매니저 반환
+
+public final Fragment getParentFragment()  
+: 이 프래그먼트를 포함하는 부모가 프래그먼트일 경우 리턴. 액티비티이면 null을 반환
+
+public final int getId()  
+: 이 프래그먼트의 ID를 반환
+
+[FragmentManager]
+
+public abstract FragmentTransaction beginTransaction()  
+: 프래그먼트를 변경하기 위한 트랜잭션을 시작
+
+public abstract Fragment findFragmentById(int id)
+
+public abstract Fragment findFragmentByTag(String tag)
+
+public abstract boolean executePendingTransactions()  
+: 트랜잭션은 commit() 메소드를 호출하면 실행되지만 비동기 방식으로 실행되므로 즉시 실행하고 싶다면 이 메소드를 추가로 호출해야함.
+
+getSupprotFragmentManager(): 예전 버전 호환  
+getFragmentManager()
+
