@@ -12,11 +12,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        mainFragment = supportFragmentManager.findFragmentById(R.id.mainFragment) as MainFragment
+        mainFragment = supportFragmentManager.findFragmentById(R.id.mainFragment) as? MainFragment?
         menuFragment = MenuFragment()
     }
 
-    fun onFragmentChanged(index: Int) {
+    public fun onFragmentChanged(index: Int) {
         if (index == 0) {
             supportFragmentManager.beginTransaction().replace(R.id.container, menuFragment!!).commit()
         } else if (index == 1) {

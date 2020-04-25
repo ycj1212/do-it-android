@@ -379,3 +379,40 @@ public abstract boolean executePendingTransactions()
 getSupprotFragmentManager(): 예전 버전 호환  
 getFragmentManager()
 
+다른 프래그먼트로 변경 시 트랜잭션 사용
+
+`supportFragmentManager.beginTransaction().replace(/* */).commit()`
+
+#### 프래그먼트 수명주기
+
+onAttach() - 프래그먼트가 액티비티와 연결될 때  
+onCreate() - 프래그먼트가 초기화될 때  
+onCreateView() - 프래그먼트와 관련되는 뷰 계층을 만들어서 반환  
+onActivityCreated() - 프래그먼트와 연결된 액티비티가 onCreate() 메서드의 작업을 완료했을 때  
+onStart()  
+onResume()  
+onPause()  
+onStop()  
+onDestroyView() - 프래그먼트와 관련된 뷰 리소스를 해제할 수 있도록 호출됨  
+onDestroy() - 프래그먼트의 상태를 마지막으로 정리할 수 있도록 호출됨  
+onDetach() - 프래그먼트가 액티비티와 연결을 끊기 바로 전에 호출됨
+
+- 액티비티에 프래그먼트 추가  
+onAttach() -> onCreate() -> onCreateView() -> onActivityCreated() -> onStart() -> onResume()
+
+- 액티비티에서 프래그먼트 제거  
+onPause() -> onStop() -> onDestroyView() -> onDestroy() -> onDetach()
+
+- Back stack에서 복구되는 경우  
+onDestroyView() -> onCreateView()
+
+#### 중요!
+
+- 프래그먼트는 액티비티 위에 올라가지 않고서는 프래그먼트로서 동작하지 않는다.
+- 프래그먼트 객체가 new 연산자가 아니라 액티비티 위에 올라가야 동작한다.
+
+`MyFragment fragment = new MyFragment();`
+-> 프래그먼트 객체는 만들어졌지만 프래그먼트로 동작하지는 않음
+`getSupportFragmentManager().beginTransaction().add(fragment).commit();`
+-> 액티비티에 추가된 후 프래그먼트로 동작함
+
