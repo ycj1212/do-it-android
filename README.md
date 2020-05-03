@@ -416,3 +416,40 @@ onDestroyView() -> onCreateView()
 `getSupportFragmentManager().beginTransaction().add(fragment).commit();`
 -> 액티비티에 추가된 후 프래그먼트로 동작함
 
+### 액션바
+
+액션바: 앱의 제목이 보이는 위쪽 부분  
+
+옵션 메뉴: 메뉴를 눌렀을 때 나타나는 메뉴  
+컨텍스트 메뉴: 화면을 길게 누르면 나타나는 메뉴 
+
+`onCreateOptionsMenu()`
+`onCreateContextMenu()`
+
+`onOptionsItemSelected()`
+
+/app/res/menu -> menu resource file
+
+```xml
+<menu>
+    <item/>
+    <item/>
+    <item/>
+</menu>
+```
+
+### 탭 (=Navigation)
+
+```xml
+<CoordinatorLayout>
+    <AppBarLayout>
+        <Toolbar>
+        </Toolbar>
+        <TabLayout>
+        </TabLayout>
+    </AppBarLayout>
+    <FrameLayout>
+    </FrameLayout>
+</CoordinatorLayout>
+```
+
