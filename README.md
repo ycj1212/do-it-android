@@ -411,19 +411,20 @@ onDestroyView() -> onCreateView()
 - 프래그먼트는 액티비티 위에 올라가지 않고서는 프래그먼트로서 동작하지 않는다.
 - 프래그먼트 객체가 new 연산자가 아니라 액티비티 위에 올라가야 동작한다.
 
-`MyFragment fragment = new MyFragment();`
+`MyFragment fragment = new MyFragment();`  
 -> 프래그먼트 객체는 만들어졌지만 프래그먼트로 동작하지는 않음
-`getSupportFragmentManager().beginTransaction().add(fragment).commit();`
+
+`getSupportFragmentManager().beginTransaction().add(fragment).commit();`  
 -> 액티비티에 추가된 후 프래그먼트로 동작함
 
 ### 액션바
 
 액션바: 앱의 제목이 보이는 위쪽 부분  
 
-옵션 메뉴: 메뉴를 눌렀을 때 나타나는 메뉴  
-컨텍스트 메뉴: 화면을 길게 누르면 나타나는 메뉴 
+- 옵션 메뉴: 메뉴를 눌렀을 때 나타나는 메뉴  
+- 컨텍스트 메뉴: 화면을 길게 누르면 나타나는 메뉴 
 
-`onCreateOptionsMenu()`
+`onCreateOptionsMenu()`  
 `onCreateContextMenu()`
 
 `onOptionsItemSelected()`
@@ -439,6 +440,8 @@ onDestroyView() -> onCreateView()
 ```
 
 ### 탭 (=Navigation)
+
+
 
 ```xml
 <CoordinatorLayout>
