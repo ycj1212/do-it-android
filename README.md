@@ -441,8 +441,6 @@ onDestroyView() -> onCreateView()
 
 ### 탭 (=Navigation)
 
-
-
 ```xml
 <CoordinatorLayout>
     <AppBarLayout>
@@ -456,3 +454,18 @@ onDestroyView() -> onCreateView()
 </CoordinatorLayout>
 ```
 
+## 서비스
+
+서비스: 백그라운드에서 실행되는 앱의 구성 요소
+
+서비스 실행  
+
+```
+메인 액티비티 -(startService() 메서드 호출)→ *서비스*(onCreate() 호출됨)  
+                                              |
+/* 서비스는 실행된 상태를 계속 유지하기 위해   비정상 종료(onDestroy() 호출됨)
+   서비스가 비정상적으로 종료되더라도            ↓
+   시스템이 자동으로 재실행합니다. */         시스템 -자동 재시작→ *서비스*
+```
+
+startService 호출 시 인텐트 객체를 파라미터로 전달
