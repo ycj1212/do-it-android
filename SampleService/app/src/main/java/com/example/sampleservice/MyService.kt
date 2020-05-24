@@ -46,5 +46,12 @@ class MyService : Service() {
 
             Log.d(TAG, "Waiting $i seconds")
         }
+
+        // 서비스에서 액티비티로 데이터 보내기
+        val showIntent = Intent(applicationContext, MainActivity::class.java)
+        showIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        showIntent.putExtra("command", "show")
+        showIntent.putExtra("name", "${name} from service")
+        startActivity(showIntent)
     }
 }

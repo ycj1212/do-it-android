@@ -474,5 +474,11 @@ onDestroyView() -> onCreateView()
 - 서비스가 실행 중이면 `startService()`를 여러 번 호출해도 이미 메모리에 만들어진 상태로 유지  
 - 따라서 `startService()`는 *서비스를 시작하는 목적* 이외에 *인텐트를 전달하는 목적*으로 자주 사용
 - 인텐트 전달 시 `onCreate()`가 아니라 `onStartCommand()` 실행
-    - `onStartCommand()`는 서비스로 전달된 인텐트 객체를 처리
-
+    - `onStartCommand()`는 서비스로 전달된 인텐트 객체를 처리  
+- 서비스에서 액티비티로 데이터 전달
+    - 서비스에서 `startActivity()` 사용
+    - FLAG_ACTIVITY_NEW_TASK: 서비스는 화면이 없기 때문에, 화면이 있는 액티비티를 띄우려면 새로운 태스크를 만들어야 한다.
+    - FLAG_ACTIVITY_SINGLE_TOP, FLAG_ACTIVITY_CLEAR_TOP: MainActiviy 객체가 이미 메모리에 만들어져 있을 때 재사용
+    - MainActivity에서 인텐트 객체 참조 시
+        - MainActivity가 메모리에 만들어져 있지 않은 상태: `onCreate()` 호출(`getIntent()`로 전달받음)
+        - MainActivity가 메모리에 만들어져 있는 상태: `onNewIntent()` 호출(파라미터로 전달받음)
