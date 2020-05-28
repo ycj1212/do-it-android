@@ -411,19 +411,20 @@ onDestroyView() -> onCreateView()
 - 프래그먼트는 액티비티 위에 올라가지 않고서는 프래그먼트로서 동작하지 않는다.
 - 프래그먼트 객체가 new 연산자가 아니라 액티비티 위에 올라가야 동작한다.
 
-`MyFragment fragment = new MyFragment();`
+`MyFragment fragment = new MyFragment();`  
 -> 프래그먼트 객체는 만들어졌지만 프래그먼트로 동작하지는 않음
-`getSupportFragmentManager().beginTransaction().add(fragment).commit();`
+
+`getSupportFragmentManager().beginTransaction().add(fragment).commit();`  
 -> 액티비티에 추가된 후 프래그먼트로 동작함
 
 ### 액션바
 
 액션바: 앱의 제목이 보이는 위쪽 부분  
 
-옵션 메뉴: 메뉴를 눌렀을 때 나타나는 메뉴  
-컨텍스트 메뉴: 화면을 길게 누르면 나타나는 메뉴 
+- 옵션 메뉴: 메뉴를 눌렀을 때 나타나는 메뉴  
+- 컨텍스트 메뉴: 화면을 길게 누르면 나타나는 메뉴 
 
-`onCreateOptionsMenu()`
+`onCreateOptionsMenu()`  
 `onCreateContextMenu()`
 
 `onOptionsItemSelected()`
@@ -453,6 +454,7 @@ onDestroyView() -> onCreateView()
 </CoordinatorLayout>
 ```
 
+<<<<<<< HEAD
 ### NavigationDrawer
 
 바로가기 메뉴: 화면의 좌측 상단에 위치한 햄버거 모양을 눌렀을 때 나타나는 화면
@@ -471,3 +473,33 @@ onDestroyView() -> onCreateView()
     </NavigationView>
 </DrawerLayout>
 ```
+=======
+## 서비스
+
+서비스: 백그라운드에서 실행되는 앱의 구성 요소
+
+- 서비스 실행  
+
+```
+메인 액티비티 -(startService() 메서드 호출)→ *서비스*(onCreate() 호출됨)  
+                                              |
+/* 서비스는 실행된 상태를 계속 유지하기 위해   비정상 종료(onDestroy() 호출됨)
+   서비스가 비정상적으로 종료되더라도            ↓
+   시스템이 자동으로 재실행합니다. */         시스템 -자동 재시작→ *서비스*
+```
+
+- `startService()` 호출 시 인텐트 객체를 파라미터로 전달  
+    - 인텐트 객체는 어떤 서비스를 실행할 것인지에 대한 정보를 담고 있음  
+    - 시스템은 서비스를 시작시킨 후 인텐트 객체를 서비스에 전달  
+- 서비스가 실행 중이면 `startService()`를 여러 번 호출해도 이미 메모리에 만들어진 상태로 유지  
+- 따라서 `startService()`는 *서비스를 시작하는 목적* 이외에 *인텐트를 전달하는 목적*으로 자주 사용
+- 인텐트 전달 시 `onCreate()`가 아니라 `onStartCommand()` 실행
+    - `onStartCommand()`는 서비스로 전달된 인텐트 객체를 처리  
+- 서비스에서 액티비티로 데이터 전달
+    - 서비스에서 `startActivity()` 사용
+    - FLAG_ACTIVITY_NEW_TASK: 서비스는 화면이 없기 때문에, 화면이 있는 액티비티를 띄우려면 새로운 태스크를 만들어야 한다.
+    - FLAG_ACTIVITY_SINGLE_TOP, FLAG_ACTIVITY_CLEAR_TOP: MainActiviy 객체가 이미 메모리에 만들어져 있을 때 재사용
+    - MainActivity에서 인텐트 객체 참조 시
+        - MainActivity가 메모리에 만들어져 있지 않은 상태: `onCreate()` 호출(`getIntent()`로 전달받음)
+        - MainActivity가 메모리에 만들어져 있는 상태: `onNewIntent()` 호출(파라미터로 전달받음)
+>>>>>>> 4762a43a6b886d6694f90aca259ef81ba2cbe999
