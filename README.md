@@ -482,3 +482,12 @@ onDestroyView() -> onCreateView()
     - MainActivity에서 인텐트 객체 참조 시
         - MainActivity가 메모리에 만들어져 있지 않은 상태: `onCreate()` 호출(`getIntent()`로 전달받음)
         - MainActivity가 메모리에 만들어져 있는 상태: `onNewIntent()` 호출(파라미터로 전달받음)
+- 서비스 종료
+    - `stopService()` 사용
+- 예) 서버에 데이터를 요청하고 응답을 기다리는 네트워킹 작업
+
+## 브로드캐스트 수신자
+
+브로드캐스팅(Broadcasting): 메시지를 여러 객체에 전달하는 것  
+예) 카카오톡 그룹 채팅방에서 메시지 전달, 안드로이드 앱 구성 요소에 메시지 전달  
+
