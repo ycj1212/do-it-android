@@ -352,32 +352,32 @@ onRestoreInstanceState()
 
 [Fragment]
 
-public final Activity getActivity()  
+`public final Activity getActivity()`  
 : 이 프래그먼트를 포함하는 액티비티 반환
 
-public final FragmentManager getFragmentManager()  
+`public final FragmentManager getFragmentManager()`  
 : 이 프래그먼트를 포함하는 액티비티에서 프래그먼트 객체들과 의사소통하는 프래그먼트 매니저 반환
 
-public final Fragment getParentFragment()  
+`public final Fragment getParentFragment()`  
 : 이 프래그먼트를 포함하는 부모가 프래그먼트일 경우 리턴. 액티비티이면 null을 반환
 
-public final int getId()  
+`public final int getId()`  
 : 이 프래그먼트의 ID를 반환
 
 [FragmentManager]
 
-public abstract FragmentTransaction beginTransaction()  
+`public abstract FragmentTransaction beginTransaction()`  
 : 프래그먼트를 변경하기 위한 트랜잭션을 시작
 
-public abstract Fragment findFragmentById(int id)
+`public abstract Fragment findFragmentById(int id)`
 
-public abstract Fragment findFragmentByTag(String tag)
+`public abstract Fragment findFragmentByTag(String tag)`
 
-public abstract boolean executePendingTransactions()  
+`public abstract boolean executePendingTransactions()`  
 : 트랜잭션은 commit() 메소드를 호출하면 실행되지만 비동기 방식으로 실행되므로 즉시 실행하고 싶다면 이 메소드를 추가로 호출해야함.
 
-getSupprotFragmentManager(): 예전 버전 호환  
-getFragmentManager()
+`getSupprotFragmentManager()`: 예전 버전 호환  
+`getFragmentManager()`
 
 다른 프래그먼트로 변경 시 트랜잭션 사용
 
@@ -453,3 +453,21 @@ onDestroyView() -> onCreateView()
 </CoordinatorLayout>
 ```
 
+### NavigationDrawer
+
+바로가기 메뉴: 화면의 좌측 상단에 위치한 햄버거 모양을 눌렀을 때 나타나는 화면
+
+```xml
+<DrawerLayout>
+    <CoordinatorLayout>
+        <AppBarLayout>
+            <Toolbar>
+            </Toolbar>
+        </AppBarLayout>
+        <FrameLayout>
+        </FrameLayout>
+    </CoordinatorLayout>
+    <NavigationView>
+    </NavigationView>
+</DrawerLayout>
+```

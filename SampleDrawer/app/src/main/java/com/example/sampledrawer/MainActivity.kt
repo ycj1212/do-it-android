@@ -19,7 +19,7 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.fragment.app.Fragment
 
-class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
+class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener, FragmentCallback {
 
     // private lateinit var appBarConfiguration: AppBarConfiguration
     var fragment1: Fragment1? = null
@@ -75,13 +75,13 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
 
         if (id == R.id.menu1) {
             Toast.makeText(this, "첫 번째 메뉴 선택됨. ", Toast.LENGTH_LONG).show()
-            onFragmentSelected(0, null)
+            onFragmentSelected(0, null!!)
         } else if (id == R.id.menu2) {
             Toast.makeText(this, "두 번째 메뉴 선택됨. ", Toast.LENGTH_LONG).show()
-            onFragmentSelected(1, null)
+            onFragmentSelected(1, null!!)
         } else if (id == R.id.menu3) {
             Toast.makeText(this, "세 번째 메뉴 선택됨. ", Toast.LENGTH_LONG).show()
-            onFragmentSelected(2, null)
+            onFragmentSelected(2, null!!)
         }
 
         drawerLayout?.closeDrawer(GravityCompat.START)
@@ -102,8 +102,11 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
             curFragment = fragment3
             toolbar?.title = "세 번째 화면"
         }
+
+        supportFragmentManager.beginTransaction().replace(R.id.container, curFragment!!).commit()
     }
 
+    /*
     override fun onCreateOptionsMenu(menu: Menu): Boolean {
         // Inflate the menu; this adds items to the action bar if it is present.
         menuInflater.inflate(R.menu.main, menu)
@@ -114,4 +117,5 @@ class MainActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelecte
         val navController = findNavController(R.id.nav_host_fragment)
         return navController.navigateUp(appBarConfiguration) || super.onSupportNavigateUp()
     }
+    */
 }
