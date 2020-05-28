@@ -352,32 +352,32 @@ onRestoreInstanceState()
 
 [Fragment]
 
-public final Activity getActivity()  
+`public final Activity getActivity()`  
 : 이 프래그먼트를 포함하는 액티비티 반환
 
-public final FragmentManager getFragmentManager()  
+`public final FragmentManager getFragmentManager()`  
 : 이 프래그먼트를 포함하는 액티비티에서 프래그먼트 객체들과 의사소통하는 프래그먼트 매니저 반환
 
-public final Fragment getParentFragment()  
+`public final Fragment getParentFragment()`  
 : 이 프래그먼트를 포함하는 부모가 프래그먼트일 경우 리턴. 액티비티이면 null을 반환
 
-public final int getId()  
+`public final int getId()`  
 : 이 프래그먼트의 ID를 반환
 
 [FragmentManager]
 
-public abstract FragmentTransaction beginTransaction()  
+`public abstract FragmentTransaction beginTransaction()`  
 : 프래그먼트를 변경하기 위한 트랜잭션을 시작
 
-public abstract Fragment findFragmentById(int id)
+`public abstract Fragment findFragmentById(int id)`
 
-public abstract Fragment findFragmentByTag(String tag)
+`public abstract Fragment findFragmentByTag(String tag)`
 
-public abstract boolean executePendingTransactions()  
+`public abstract boolean executePendingTransactions()`  
 : 트랜잭션은 commit() 메소드를 호출하면 실행되지만 비동기 방식으로 실행되므로 즉시 실행하고 싶다면 이 메소드를 추가로 호출해야함.
 
-getSupprotFragmentManager(): 예전 버전 호환  
-getFragmentManager()
+`getSupprotFragmentManager()`: 예전 버전 호환  
+`getFragmentManager()`
 
 다른 프래그먼트로 변경 시 트랜잭션 사용
 
@@ -454,6 +454,24 @@ onDestroyView() -> onCreateView()
 </CoordinatorLayout>
 ```
 
+### NavigationDrawer
+
+바로가기 메뉴: 화면의 좌측 상단에 위치한 햄버거 모양을 눌렀을 때 나타나는 화면
+
+```xml
+<DrawerLayout>
+    <CoordinatorLayout>
+        <AppBarLayout>
+            <Toolbar>
+            </Toolbar>
+        </AppBarLayout>
+        <FrameLayout>
+        </FrameLayout>
+    </CoordinatorLayout>
+    <NavigationView>
+    </NavigationView>
+</DrawerLayout>
+```
 ## 서비스
 
 서비스: 백그라운드에서 실행되는 앱의 구성 요소
@@ -486,8 +504,29 @@ onDestroyView() -> onCreateView()
     - `stopService()` 사용
 - 예) 서버에 데이터를 요청하고 응답을 기다리는 네트워킹 작업
 
-## 브로드캐스트 수신자
+## 브로드캐스트 수신자(Broadcast Receiver)
 
 브로드캐스팅(Broadcasting): 메시지를 여러 객체에 전달하는 것  
 예) 카카오톡 그룹 채팅방에서 메시지 전달, 안드로이드 앱 구성 요소에 메시지 전달  
 
+브로드캐스트 수신자를 등록하면 액티비티 안에서 브로드캐스트 메시지를 전달받아 다른 작업 수행 가능 
+
+`onReceive()`: 원하는 브로드캐스트 메시지가 도착하면 자동으로 호출됨  
+
+```xml
+<manifest>
+    <!-- SMS 수신 권한 -->
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <application>
+        <receiver>
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+                <!--
+                    SMS 메시지가 들어간 인텐트를 구분하기 위한 액션 정보
+                    단말에서 SMS를 수신했을 때 이 action 정보가 들어간 인텐트를 전달함
+                -->
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>
+```
