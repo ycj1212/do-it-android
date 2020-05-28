@@ -454,7 +454,6 @@ onDestroyView() -> onCreateView()
 </CoordinatorLayout>
 ```
 
-<<<<<<< HEAD
 ### NavigationDrawer
 
 바로가기 메뉴: 화면의 좌측 상단에 위치한 햄버거 모양을 눌렀을 때 나타나는 화면
@@ -473,7 +472,6 @@ onDestroyView() -> onCreateView()
     </NavigationView>
 </DrawerLayout>
 ```
-=======
 ## 서비스
 
 서비스: 백그라운드에서 실행되는 앱의 구성 요소
@@ -502,4 +500,30 @@ onDestroyView() -> onCreateView()
     - MainActivity에서 인텐트 객체 참조 시
         - MainActivity가 메모리에 만들어져 있지 않은 상태: `onCreate()` 호출(`getIntent()`로 전달받음)
         - MainActivity가 메모리에 만들어져 있는 상태: `onNewIntent()` 호출(파라미터로 전달받음)
->>>>>>> 4762a43a6b886d6694f90aca259ef81ba2cbe999
+
+
+### 브로드캐스트 수신자(Broadcast Receiver)
+
+브로드캐스팅: 메시지를 여러 객체에 전달하는 것
+
+브로드캐스트 수신자를 등록하면 액티비티 안에서 브로드캐스트 메시지를 전달받아 다른 작업 수행 가능
+
+`onReceive()`: 원하는 브로드캐스트 메시지가 도착하면 자동으로 호출됨
+
+```xml
+<manifest>
+    <!-- SMS 수신 권한 -->
+    <uses-permission android:name="android.permission.RECEIVE_SMS" />
+    <application>
+        <receiver>
+            <intent-filter>
+                <action android:name="android.provider.Telephony.SMS_RECEIVED" />
+                <!--
+                    SMS 메시지가 들어간 인텐트를 구분하기 위한 액션 정보
+                    단말에서 SMS를 수신했을 때 이 action 정보가 들어간 인텐트를 전달함
+                -->
+            </intent-filter>
+        </receiver>
+    </application>
+</manifest>
+```
