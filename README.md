@@ -507,11 +507,11 @@ onDestroyView() -> onCreateView()
 ## 브로드캐스트 수신자(Broadcast Receiver)
 
 브로드캐스팅(Broadcasting): 메시지를 여러 객체에 전달하는 것  
-예) 카카오톡 그룹 채팅방에서 메시지 전달, 안드로이드 앱 구성 요소에 메시지 전달  
+예) 카카오톡 그룹 채팅방에서 메시지 전달, 안드로이드 앱 구성 요소에 메시지 전달
 
-브로드캐스트 수신자를 등록하면 액티비티 안에서 브로드캐스트 메시지를 전달받아 다른 작업 수행 가능 
+브로드캐스트 수신자를 등록하면 액티비티 안에서 브로드캐스트 메시지를 전달받아 다른 작업 수행 가능
 
-`onReceive()`: 원하는 브로드캐스트 메시지가 도착하면 자동으로 호출됨  
+`onReceive()`: 원하는 브로드캐스트 메시지가 도착하면 자동으로 호출됨
 
 ```xml
 <manifest>
@@ -530,3 +530,83 @@ onDestroyView() -> onCreateView()
     </application>
 </manifest>
 ```
+
+## 위험 권한 부여하기
+
+마시멜로(API 23)부터는 중요한 권한들을 분류하여 설치 시점이 아니라 앱을 실행했을 때 사용자로부터 권한을 부여받도록 변경되었음  
+
+일반 권한 - 설치 시  
+위험 권환 - 실행 시  
+
+위험 권한 분류
+- 위치
+- 카메라
+- 마이크
+- 연락처
+- 전화
+- 문자
+- 일정
+- 센서
+
+## 리소스(Resource)
+
+/app/assets  
+: 에셋(Asset)은 동영상이나 웹페이지와 같은 용량이 큰 데이터를 의미
+
+/app/res  
+: 리소스는 빌드되어 설치 파일에 추가
+
+리소스가 갱신되면 리소스의 정보가 R.java 파일에 자동으로 기록  
+
+/app/res/values  
+: 문자열이나 기타 기본 데이터 타입에 해당하는 정보들
+
+/app/res/drawable  
+: 이미지 저장
+
+Resources 객체 참조 -> `Context.getResources()`
+
+## 그래들(Gradle)
+
+그래들: 빌드 및 배포 도구
+
+build.gradle  
+- 프로젝트 수준  
+- 모듈 수준  
+
+build.gradle (Project: ~)  
+: 프로젝트 안에 들어있는 모든 모듈에 적용되는 설정을 담고 있음  
+
+build.gradle (Module:app)  
+: 각각의 모듈에 대한 설정을 담고 있음  
+
+applicationId  
+: 앱의 id값(전 세계에서 유일한 값)  
+compileSdkVersion  
+: 사용할 SDK 버전(보통 최신 버전)  
+minSdkVersion  
+: 지원가능한 최소 하위 버전  
+targetSdkVersion  
+: 검증된 SDK 버전  
+dependencies  
+: 외부 라이브러리 추가 가능  
+implementation  
+: 추가한 외부 라이브러리
+
+
+settings.gradle  
+: 어떤 모듈을 포함할 것인지에 대한 정보가 들어있음
+
+```gradle
+include ':app'
+```
+
+local.properties  
+: PC에 설치된 SDK 위치  
+
+gradle.properties  
+: 메모리 설정
+
+gradle-wrapper.properties  
+: 그래들 버전 정보
+

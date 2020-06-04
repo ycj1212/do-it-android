@@ -7,11 +7,14 @@ import android.os.Build
 import android.os.Bundle
 import android.telephony.SmsMessage
 import android.util.Log
+import java.text.SimpleDateFormat
 import java.util.*
 
 const val TAG = "SmsReceiver"
 
 class SmsReceiver : BroadcastReceiver() {
+    val format = SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+
     // SMS를 받으면 자동으로 호출됨
     // intent: SMS 데이터
     override fun onReceive(context: Context, intent: Intent) {
@@ -20,7 +23,7 @@ class SmsReceiver : BroadcastReceiver() {
         val bundle = intent.extras  // 인텐트에서 Bundle 객체 가져오기
         val messages: Array<SmsMessage?> = parseSmsMessage(bundle!!)    // parseSmsMessage() 메서드 호출
 
-        if (messages.size > 0) {
+        if (messages.isNotEmpty()) {
             val sender = messages[0]?.originatingAddress    // 발신자 번호
             Log.i(TAG, "SMS sender: ${sender}")
 
@@ -29,6 +32,8 @@ class SmsReceiver : BroadcastReceiver() {
 
             val receivedDate = Date(messages[0]!!.timestampMillis)  // SMS 받은 시각
             Log.i(TAG, "SMS received date: ${receivedDate.toString()}")
+
+            sendToActivity(context, sender!!, contents!!, receivedDate)
         }
     }
 
@@ -52,5 +57,16 @@ class SmsReceiver : BroadcastReceiver() {
         }
 
         return messages
+    }
+
+    private fun sendToActivity(context: Context, sender: String, contents: String, receivedDate: Date) {
+        val myIntent = Intent(context, SmsActivity::class.java)
+
+        myIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_SINGLE_TOP or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        myIntent.putExtra("sender", sender)
+        myIntent.putExtra("contents", contents)
+        myIntent.putExtra("receivedDate", format.format(receivedDate))
+
+        context.startActivity(myIntent)
     }
 }
