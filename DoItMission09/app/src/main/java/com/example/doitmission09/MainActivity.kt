@@ -18,7 +18,6 @@ class MainActivity : AppCompatActivity() {
     var button1: Button? = null
     var button2: Button? = null
 
-    @RequiresApi(Build.VERSION_CODES.N)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -28,20 +27,23 @@ class MainActivity : AppCompatActivity() {
         button1 = findViewById(R.id.button1)
         button2 = findViewById(R.id.button2)
 
-        var y = 0
-        var m = 0
-        var d = 0
+        val calendar = Calendar.getInstance()
+        var y = calendar.get(Calendar.YEAR)
+        var m = calendar.get(Calendar.MONTH)
+        var d = calendar.get(Calendar.DAY_OF_MONTH)
         val format = SimpleDateFormat("yyyy-MM-dd")
-        val datePickerDialog = DatePickerDialog(this)
         val datePickerDialog = DatePickerDialog(this, DatePickerDialog.OnDateSetListener{
-            view, year, month, dayOfMonth -> y = year; m = month; d = dayOfMonth
-        }, 0, 0, 0)
+            view, year, monthOfYear, dayOfMonth ->
+            calendar.set(Calendar.YEAR, year)
+            calendar.set(Calendar.MONTH, monthOfYear)
+            calendar.set(Calendar.DAY_OF_MONTH, dayOfMonth)
+            button1?.text = format.format(calendar.time)
+        }, y, m, d)
 
-        button1?.text = format.format(Calendar.getInstance().time)    // 오늘 날짜
-        // 날짜 선택 대화상자를 띄우고 날짜를 입력받아 표시합니다.
+        button1?.text = format.format(Calendar.getInstance().time)    // 오늘 날짜 표시
+        // 날짜 선택 대화상자를 띄우고 날짜를 입력받아 표시
         button1?.setOnClickListener{
             datePickerDialog.show()
-            button1?.text = format.format(Date(y, m, d))
         }
         button2?.setOnClickListener{
             Toast.makeText(this, "이름: ${edittext1?.editableText.toString()}\n나이: ${edittext2?.editableText.toString()}\n생년월일: ${button1?.text}", Toast.LENGTH_LONG).show()

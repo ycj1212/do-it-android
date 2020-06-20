@@ -439,7 +439,19 @@ onDestroyView() -> onCreateView()
 </menu>
 ```
 
-### 탭 (=Navigation)
+### 탭(=Navigation)
+
+외부 라이브러리인 material 라이브러리에 존재
+
+> /Gradle Scripts/build.gradle (Module: app)
+
+```gradle
+...
+dependencies {
+    ...
+    implementation 'com.google.android.materal:material:1.0.0'
+}
+```
 
 ```xml
 <CoordinatorLayout>
@@ -452,6 +464,129 @@ onDestroyView() -> onCreateView()
     <FrameLayout>
     </FrameLayout>
 </CoordinatorLayout>
+```
+
+```java
+public class Fragment1 extends Fragment {
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        return inflater.inflate(R.layout.fragment1, container, false);
+    }
+}
+```
+
+```java
+public class MainActivity extends AppCompatActivity {
+    Fragment1 fragment1;
+    Fragment2 fragment2;
+    Fragment3 fragment3;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        fragment1 = new Fragment1();
+        fragment2 = new Fragment2();
+        fragment3 = new Fragment3();
+
+        getSupportFragmentManager().beginTransaction().replace(R.id.container, fragment1).commit();
+    }
+}
+```
+
+### 하단 탭(=Bottom Navigation)
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<menu
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item
+        android:id="@+id/tab1"
+        android:title="첫번째" />
+
+    <item
+        android:id="@+id/tab2"
+        android:title="두번째"/>
+
+    <item
+        android:id="@+id/tab3"
+        android:title="세번째"/>
+
+</menu>
+```
+
+```xml
+<com.google.android.material.bottomnavigation.BottomNavigationView
+    android:id="@+id/bottom_navigation"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+
+    app:layout_constraintBottom_toBottomOf="parent"
+    app:layout_constraintLeft_toLeftOf="parent"
+    app:layout_constraintRight_toRightOf="parent"
+
+    app:itemBackground="@color/colorPrimary"
+    app:menu="@menu/menu_bottom"/>
+```
+
+### 뷰페이저(ViewPager)
+
+```xml
+<androidx.viewpager.widget.ViewPager
+    android:id="@+id/pager"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"/>
+```
+
+```java
+public class MainActivity extends AppCompatActivity {
+    ViewPager pager;
+    
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        pager = findViewById(R.id.pager);
+        pager.setOffscreenPageLimit(3);
+
+        MyPagerAdapter adapter = new MyPagerAdapter(getSupportFragmentManager());
+        Fragment1 fragment1 = new Fragment1();
+        Fragment2 fragment2 = new Fragment2();
+        Fragment3 fragment3 = new Fragment3();
+    
+        adapter.addItem(fragment1);
+        adapter.addItem(fragment2);
+        adapter.addItem(fragment3);
+
+        pager.setAdapter(adapter);
+    }
+
+    class MyPagerAdapter extends FragmentStatePagerAdapter {
+        ArrayList<Fragment> items = new ArrayList<Fragment>();
+
+        public MyPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        public void addItem(Fragment item) {
+            items.add(item);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return items.get(position);
+        }
+
+        @Override
+        public int getCount() {
+            return items.size();
+        }
+    }
+}
 ```
 
 ### NavigationDrawer
