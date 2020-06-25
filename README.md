@@ -607,6 +607,8 @@ public class MainActivity extends AppCompatActivity {
     </NavigationView>
 </DrawerLayout>
 ```
+
+
 ## 서비스
 
 서비스: 백그라운드에서 실행되는 앱의 구성 요소

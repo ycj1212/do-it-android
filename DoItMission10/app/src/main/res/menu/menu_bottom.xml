@@ -5,14 +5,17 @@
 
     <item
         android:id="@+id/tab1"
-        android:title="첫번째" />
+        android:title="첫번째"
+        app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/tab2"
-        android:title="두번째"/>
+        android:title="두번째"
+        app:showAsAction="ifRoom"/>
 
     <item
         android:id="@+id/tab3"
-        android:title="세번째"/>
+        android:title="세번째"
+        app:showAsAction="ifRoom"/>
 
 </menu>
