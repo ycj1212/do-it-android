@@ -35,9 +35,8 @@ class MainActivity : AppCompatActivity() {
         pager?.adapter = adapter
     }
 
-    class MyPagerAdapter : FragmentStatePagerAdapter {
+    class MyPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
         val items = ArrayList<Fragment>()
-        constructor(fm: FragmentManager) : super(fm)
 
         fun addItem(item: Fragment) {
             items.add(item)
