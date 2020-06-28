@@ -5,14 +5,18 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.appcompat.app.ActionBarDrawerToggle
 import androidx.appcompat.widget.Toolbar
+import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.navigation.NavigationView
 
 class MainActivity : AppCompatActivity() {
+    var drawerLayout: DrawerLayout? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -20,9 +24,9 @@ class MainActivity : AppCompatActivity() {
         val toolbar: Toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        val drawerLayout: DrawerLayout = findViewById(R.id.drawer_layout)
+        drawerLayout = findViewById(R.id.drawer_layout)
         val toggle = ActionBarDrawerToggle(this, drawerLayout, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close)
-        drawerLayout.addDrawerListener(toggle)
+        drawerLayout?.addDrawerListener(toggle)
         toggle.syncState()
 
         val fragment1: Fragment = Fragment1()
@@ -63,6 +67,35 @@ class MainActivity : AppCompatActivity() {
             }
 
             false
+        }
+
+        val navigationView: NavigationView = findViewById(R.id.nav_view)
+        navigationView.setNavigationItemSelectedListener {
+            when (it.itemId) {
+                R.id.menu1 -> {
+                    pager.currentItem = 0
+                    true
+                }
+                R.id.menu2 -> {
+                    pager.currentItem = 1
+                    true
+                }
+                R.id.menu3 -> {
+                    pager.currentItem = 2
+                    true
+                }
+                else -> true
+            }
+            drawerLayout?.closeDrawer(GravityCompat.START)
+            true
+        }
+    }
+
+    override fun onBackPressed() {
+        if (drawerLayout!!.isDrawerOpen(GravityCompat.START)) {
+            drawerLayout?.closeDrawer(GravityCompat.START)
+        } else {
+            super.onBackPressed()
         }
     }
 
