@@ -747,3 +747,21 @@ gradle.properties
 gradle-wrapper.properties  
 : 그래들 버전 정보
 
+## 선택 위젯 만들기
+
+### 나인패치(Nine Patch)
+
+이미지 확대 및 축소로 인해 이미지 왜곡을 해결하는 방법
+
+![Nine_Patch](./SampleNinePatch/nine_patch.jpg)
+
+`button_image.png`  
+`button_image.9.png`  
+
+### 새로운 뷰 만들기
+
+- `public void onMeasure(int widthMeasureSpec, int heightMeasureSpec)`  
+- `public void onDraw(Canvas canvas)`  
+
+onDraw()  
+invalidate()  
