@@ -753,15 +753,22 @@ gradle-wrapper.properties
 
 이미지 확대 및 축소로 인해 이미지 왜곡을 해결하는 방법
 
-![Nine_Patch](./SampleNinePatch/nine_patch.jpg)
-
 `button_image.png`  
 `button_image.9.png`  
+
+![Nine_Patch](./SampleNinePatch/nine_patch.jpg)
 
 ### 새로운 뷰 만들기
 
 - `public void onMeasure(int widthMeasureSpec, int heightMeasureSpec)`  
+    - 뷰가 스스로 크기를 정할 때 자동으로 호출
 - `public void onDraw(Canvas canvas)`  
+    - 스스로를 레이아웃에 맞게 그릴 때 자동으로 호출
 
-onDraw()  
-invalidate()  
+onDraw(): 화면에 그림  
+invalidate(): onDraw()를 호출하여 다시 그림  
+
+### 레이아웃 정의하고 카드뷰 넣기
+
+카드뷰(CardView): 프로필과 같은 간단 정보를 넣기 위해 각 영역을 구분하는 역할을 함
+
