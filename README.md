@@ -768,12 +768,12 @@ gradle-wrapper.properties
 onDraw(): 화면에 그림  
 invalidate(): onDraw()를 호출하여 다시 그림  
 
-### 카드뷰
+### 카드뷰(CardView)
 
 카드뷰(CardView): 프로필과 같은 간단 정보를 넣기 위해 각 영역을 구분하는 역할을 함  
 - 외부 라이브러리 사용
 
-### 리싸이클러뷰 만들기
+### 리싸이클러뷰(RecyclerView)
 
 선택 위젯(Selection Widget): 여러 개의 아이템 중에 하나를 선택할 수 있는 리스트 모양의 위젯  
 - 어댑터(Adapter) 패턴 사용
@@ -782,11 +782,93 @@ invalidate(): onDraw()를 호출하여 다시 그림
 - 상하, 좌우 스크롤 가능
 - 각각의 아이템이 화면에 보일 때 메모리를 효율적으로 사용하도록 캐시 메커니즘이 구현되어 있음
 - 리스트뷰보다는 리싸이클러뷰 권장(장점이 더 많음)
-- 외부 라이브러리 사용
+- 외부 라이브러리 사용  
 
-### 스피너
+_Adapter.kt_
 
-여러 아이템 중에서 하나를 선택하는 전형적인 위젯
+```kotlin
+class Item(var name: String, var age: String)
+class Adapter : RecyclerView.Adapter<Adapter.ViewHolder> {
+    var items: ArrayList<Item> = ArrayList()
+
+    class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
+        var textView01: TextView? = null
+        var textView02: TextView? = null
+
+        init {
+            textView01 = itemView.findViewById(R.id.textView01)
+            textView02 = itemView.findViewById(R.id.textView02)
+        }
+
+        fun setItem(item: Item) {
+            textView01?.text = item.name
+            textView02?.text = item.age
+        }
+    }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
+        val inflater: LayoutInflater = LayoutInflater.from(parent.context)
+        val itemView: View = inflater.inflate(R.layout.client_information, parent, false)
+
+        return ViewHolder(itemView)
+    }
+
+    override fun getItemCount(): Int {
+        return items.size
+    }
+
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+        val item: Client = items[position]
+        holder.setItem(item)
+    }
+
+    fun addItem(item: Item) {
+        items.add(item)
+    }
+}
+```
+
+_MainActivity.kt_
+
+```kotlin
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        val recyclerView: RecyclerView = findViewById(R.id.recyclerview)
+        val layoutManager: LinearLayoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
+        val adapter: Adapter = Adapter()
+
+        recyclerView.layoutManager = layoutManager
+        recyclerView.adapter = adapter
+
+        val button: Button = findViewById(R.id.button)
+        button.setOnClickListener {
+            adapter.addItem(Client(name, birth, phone))
+            adapter.notifyDataSetChanged()
+        }
+    }
+}
+```
+
+`RecyclerView`
+- `RecyclerView.Adapter<RecyclerView.ViewHolder>`: 특정 데이터 셋으로부터 리싸이클러뷰 안에 보여지는 뷰들로 바인딩을 제공
+    - `onCreateViewHolder()`: 새로운 ViewHolder가 생성될 때 호출됨
+    - `getItemCount()`: 어댑터의 데이터 셋 안에 있는 아이템들의 총 개수
+    - `onBindViewHolder()`: 특정 위치에 있는 데이터를 보여주기 위해 호출됨
+- `RecyclerView.ViewHolder`: 리싸이클러뷰 내의 한 아이템 뷰 및 메타데이터를 설명
+- `RecyclerView.setLayoutManager`: 리싸이클러뷰 내의 아이템 뷰들을 측정하고 배치하는 레이아웃 관리자 설정
+    - `LinearLayoutManager`
+    - `GridLayoutManager`
+- `RecyclerView.setAdapter`
+
+
+### 스피너(Spinner)
+
+여러 아이템 중에서 하나를 선택하는 전형적인 위젯  
+윈도우의 콤보 박스(Select Box)와 유사  
+Spinner를 터치하면 기타 모든 사용 가능한 값을 포함하는 드롭다운 메뉴가 표시되며, 여기서 새 값을 선택 가능  
 
 - __`Spinner`__
     - `setAdapter`
@@ -794,7 +876,7 @@ invalidate(): onDraw()를 호출하여 다시 그림
 
 - __`ArrayAdapter<?>`__  
     - `setDropDownViewResource`
-    
+
 - __`AdapterView.OnItemSelectedListener`__
     - `onNothingSelected`
     - `onItemSelected`
