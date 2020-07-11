@@ -784,3 +784,18 @@ invalidate(): onDraw()를 호출하여 다시 그림
 - 리스트뷰보다는 리싸이클러뷰 권장(장점이 더 많음)
 - 외부 라이브러리 사용
 
+### 스피너
+
+여러 아이템 중에서 하나를 선택하는 전형적인 위젯
+
+- __`Spinner`__
+    - `setAdapter`
+    - `setOnItemSelectedListener`
+
+- __`ArrayAdapter<?>`__  
+    - `setDropDownViewResource`
+    
+- __`AdapterView.OnItemSelectedListener`__
+    - `onNothingSelected`
+    - `onItemSelected`
+

@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView
 
 class PersonAdapter : RecyclerView.Adapter<PersonAdapter.ViewHolder>() {
     private var items: ArrayList<Person> = ArrayList<Person>()
+
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var textView: TextView? = null
         var textView2: TextView? = null
