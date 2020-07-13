@@ -901,3 +901,75 @@ Spinner를 터치하면 기타 모든 사용 가능한 값을 포함하는 드�
 2. XML을 로딩하여 애니메이션 객체 생성
 3. 뷰에 애니메이션 적용
 
+### 확대/축소
+
+`scale.xml`
+
+```xml
+<set xmlns:android="http://schemas.android.com/apk/res/android">
+    <scale
+        android:duration="2500"
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:fromXScale="1.0"
+        android:fromYScale="1.0"
+        android:toXScale="2.0"
+        android:toYScale="2.0" />
+    <scale
+        android:startOffset="2500"
+        android:duration="2500"
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:fromXScale="1.0"
+        android:fromYScale="1.0"
+        android:toXScale="2.0"
+        android:toYScale="2.0" />
+</set>
+```
+
+`MainActivity.kt`
+
+```kotlin
+button.setOnClickListener {
+    val animation: Animation = AnimationUtils.loadAnimation(applicationContext, R.anim.scale)
+    it.startAnimation(animation)
+}
+```
+
+### 이동
+
+`translate.xml`
+
+```xml
+<translate xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fromXDelta="0%p"
+    android:toXDelta="-100%p"
+    android:duration="20000"
+    android:repeatCount="-1"
+    android:fillAfter="true" />
+```
+
+### 회전
+
+`rotate.xml`
+
+```xml
+<rotate xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fromDegrees="0"
+    android:toDegrees="0"
+    android:pivotX="50%"
+    android:pivotY="50%"
+    android:duration="10000" />
+```
+
+### 투명도
+
+`alpha.xml`
+
+```xml
+<alpha xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fromAlpha="0.0"
+    android:toAlpha="1.0"
+    android:duration="10000" />
+```
+
