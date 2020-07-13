@@ -773,6 +773,20 @@ invalidate(): onDraw()를 호출하여 다시 그림
 카드뷰(CardView): 프로필과 같은 간단 정보를 넣기 위해 각 영역을 구분하는 역할을 함  
 - 외부 라이브러리 사용
 
+```xml
+<androidx.cardview.widget.CardView
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:cardBackgroundColor="#FFFFFFFF"
+    app:cardCornerRadius="10dp"
+    app:cardElevation="5dp"
+    app:cardUseCompatPadding="true">
+    ...
+    <View>
+    ...
+</androidx.cardview.widget.CardView>
+```
+
 ### 리싸이클러뷰(RecyclerView)
 
 선택 위젯(Selection Widget): 여러 개의 아이템 중에 하나를 선택할 수 있는 리스트 모양의 위젯  
@@ -880,4 +894,10 @@ Spinner를 터치하면 기타 모든 사용 가능한 값을 포함하는 드�
 - __`AdapterView.OnItemSelectedListener`__
     - `onNothingSelected`
     - `onItemSelected`
+
+## 애니메이션과 다양한 위젯 사용하기
+
+1. 애니메이션 동작 정보 XML로 작성
+2. XML을 로딩하여 애니메이션 객체 생성
+3. 뷰에 애니메이션 적용
 

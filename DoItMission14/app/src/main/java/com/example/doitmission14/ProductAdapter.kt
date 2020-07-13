@@ -4,6 +4,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.view.marginStart
 import androidx.recyclerview.widget.RecyclerView
 
 class Product(var name: String, var price: String, var description: String)
