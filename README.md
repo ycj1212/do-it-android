@@ -973,6 +973,7 @@ button.setOnClickListener {
     android:duration="10000" />
 ```
 
+<<<<<<< HEAD
 ## 페이지 슬라이딩 사용하기
 
 레이아웃에 애니메이션을 사용할 수 있다.
@@ -985,7 +986,7 @@ button.setOnClickListener {
 ## 앱 화면에 웹브라우저 넣기
 
 앱에서 웹사이트를 띄우는 방법
-- 앱 화면엔 웹 브라우저 띄우기: 인텐트 객체 생성 -> 시스템으로 요청
+- 앱 화면엔 웹 브라우저 띄우기: 인텐트 객체를 만들어서 웹사이트 주소를 넣은 후 시스템으로 요청
 - 앱 화면에 웹 브라우저 넣기: 웹뷰(WebView) 사용
     - 인터넷 접속 권한 등록  
 
@@ -1035,4 +1036,28 @@ button.setOnClickListener {
         ...
     ```
 
-## 시크바
+## 시크바(SeekBar)
+
+프로그레스바처럼 사용할 수 있는 대표적인 상태 표시 위젯  
+프로그레스바를 확장하여 만든 것, 사용자가 값을 조정할 수 있음
+
+### `OnSeekBarChangeListener`
+
+- `onStartTrackingTouch(seekBar: SeekBar)`
+- `onStopTrackingTouch(seekBar: SeekBar)`
+- `onProgressChanged(seekBar: SeekBar, progress: Int, fromUser: Boolean)`: 변경된 progress 값을 전달받음
+    - `fromUser`: 변경된 값이 사용자가 입력한 것인지 아니면 코드에서 변경된 것인지 구별
+
+## 키패드 제어하기
+
+### `InputMethodManager`
+
+- showSoftInput(view: View, flags: Int)
+- hideSoftInputFromWindow(windowToken: IBinder, flags: Int)
+
+화면이 떴을 때 키패드가 올라오지 않는 속성
+
+```xml
+<activity android:name=".MainActivity"
+    android:windowSoftInputMode="stateHidden">
+```
