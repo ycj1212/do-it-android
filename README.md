@@ -895,7 +895,7 @@ Spinner를 터치하면 기타 모든 사용 가능한 값을 포함하는 드�
     - `onNothingSelected`
     - `onItemSelected`
 
-## 애니메이션과 다양한 위젯 사용하기
+## 애니메이션 사용하기
 
 1. 애니메이션 동작 정보 XML로 작성
 2. XML을 로딩하여 애니메이션 객체 생성
@@ -973,3 +973,66 @@ button.setOnClickListener {
     android:duration="10000" />
 ```
 
+## 페이지 슬라이딩 사용하기
+
+레이아웃에 애니메이션을 사용할 수 있다.
+
+`Animation.AnimationListener` 인터페이스 구현
+- `onAnimationEnd()`: 애니메이션이 끝날 때 동작 구현
+- `onAnimationStart()`: 애니메이션이 시작할 때 동작 구현
+- `onAnimationRepeat()`: 애니메이션이 반복될 때 동작 구현
+
+## 앱 화면에 웹브라우저 넣기
+
+앱에서 웹사이트를 띄우는 방법
+- 앱 화면엔 웹 브라우저 띄우기: 인텐트 객체 생성 -> 시스템으로 요청
+- 앱 화면에 웹 브라우저 넣기: 웹뷰(WebView) 사용
+    - 인터넷 접속 권한 등록  
+
+    ```xml
+    <uses-permission android:name="android.permission.INTERNET"/>
+    ```
+
+    - XML 레이아웃에 웹뷰 추가
+
+    ```xml
+    <WebView
+        android:id="@+id/webView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+    ```
+
+    - 설정
+
+    ```kt
+    val webView: WebView = findViewById(R.id.webView)
+
+    // 웹뷰의 설정 수정하기
+    val webSettings: WebSettings = webView.settings
+    webSettings.javaScriptEnabled = true
+
+    webView.webViewClient = ViewClient()
+
+    // 사이트 로딩하기
+    webView.loadUrl(/* web site address */)
+
+    // WebView 객체에 웹페이지를 보여주기 위함
+    private class ViewClient : WebViewClient() {
+        override fun shouldOverrideUrlLoading(view: WebView?, url: String?): Boolean {
+            view?.loadUrl(url)
+
+            return true
+        }
+    }
+    ```
+
+    - 속성 추가(웹뷰 안에 웹사이트 표시 위함)
+
+    ```xml
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <application
+        android:usesCleartextTraffic="true"
+        ...
+    ```
+
+## 시크바
