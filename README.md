@@ -973,7 +973,6 @@ button.setOnClickListener {
     android:duration="10000" />
 ```
 
-<<<<<<< HEAD
 ## 페이지 슬라이딩 사용하기
 
 레이아웃에 애니메이션을 사용할 수 있다.
