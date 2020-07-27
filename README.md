@@ -1052,8 +1052,8 @@ button.setOnClickListener {
 
 ### `InputMethodManager`
 
-- showSoftInput(view: View, flags: Int)
-- hideSoftInputFromWindow(windowToken: IBinder, flags: Int)
+- `showSoftInput(view: View, flags: Int)`
+- `hideSoftInputFromWindow(windowToken: IBinder, flags: Int)`
 
 화면이 떴을 때 키패드가 올라오지 않는 속성
 
@@ -1061,3 +1061,204 @@ button.setOnClickListener {
 <activity android:name=".MainActivity"
     android:windowSoftInputMode="stateHidden">
 ```
+
+---
+
+## 스레드와 핸들러
+
+직접 만든 스레드는 UI 객체에 접근 불가  
+UI를 관리하는 메인 스레드와 동시에 접근할 때 발생하는 문제 방지
+
+메인 스레드: 안드로이드에서 UI를 처리할 때 사용되는 기본 스레드  
+핸들러: 새로 생성된 다른 스레드에서 핸들러 객체를 사용하여 메시지를 메인 스레드에 전달
+
+### 스레드 사용하기
+
+```kt
+var value = 0
+lateinit var textView: TextView
+
+override fun onCreate(savedInstanceState: Bundle) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_main)
+
+    textView = findViewById(R.id.textView)
+
+    val button: Button = findViewById(R.id.button)
+    button.setOnClickListener {
+        val thread: BackgroundThread = BackgroundThread()
+        thread.start()
+    }
+}
+
+inner class BackgroundThread : Thread() {
+    override fun run() {
+        for (i in 0 until 100) {
+            try {
+                sleep(1000)
+            } catch (e: Exception) {}
+
+            value += 1
+            textView.text = "value 값: $value"  // Error: UI 객체 직접 접근
+        }
+    }
+}
+```
+핸들러를 사용하여 문제 해결해야 함
+
+### 핸들러로 메시지 전송하기
+
+![](./message_queue.jpg)
+
+```kt
+lateinit var textView: TextView
+lateinit var handler: MainHandler
+
+override fun onCreate(savedInstanceState: Bundle) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_main)
+
+    textView = findViewById(R.id.textView)
+
+    val button: Button = findViewById(R.id.button)
+    button.setOnClickListener {
+        val thread: BackgroundThread = BackgroundThread()
+        thread.start()
+    }
+
+    handler = MainHandler()
+}
+
+inner class BackgroundThread : Thread() {
+    override fun run() {
+        for (i in 0 until 100) {
+            try {
+                sleep(1000)
+            } catch (e: Exception) {}
+
+            value += 1
+
+            val message: Message = handler.obtainMessage()
+            val bundle: Bundle = Bundle()
+            bundle.putInt("value", value)
+            message.setData(bundle)
+
+            handler.sendMessage(message)    // 핸들러로 메시지 객체 보내기
+        }
+    }
+}
+
+inner class MainHandler : Handler() {
+    // 핸들러 안에서 전달받은 메시지 객체 처리하기
+    override fun handlerMessage(msg: Message) {
+        super.handleMessage(msg)
+
+        val bundle = msg.data
+        val value = bundle.getInt("value")
+        textView.text = "value 값: $value"
+    }
+}
+```
+
+### Runnable 객체 실행하기
+
+```kt
+lateinit var textView: TextView
+val handler: Handler = Handler()
+
+override fun onCreate(savedInstanceState: Bundle) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_main)
+
+    textView = findViewById(R.id.textView)
+
+    val button: Button = findViewById(R.id.button)
+    button.setOnClickListener {
+        val thread: BackgroundThread = BackgroundThread()
+        thread.start()
+    }
+}
+
+inner class BackgroundThread : Thread() {
+    var value = 0
+
+    override fun run() {
+        for (i in 0 until 100) {
+            try {
+                sleep(1000)
+            } catch (e: Exception) {}
+
+            value += 1
+
+            handler.post {
+                textView.text = "value 값: $value"
+            }
+        }
+    }
+}
+```
+
+## 스레드로 메시지 전송하기
+
+메인 스레드에서 별도의 스레드로 메시지를 전달하는 방법
+
+![](./looper.jpg)
+
+```kt
+lateinit var editText: EditText
+lateinit var textView: TextView
+
+val handler = Handler()
+
+lateinit var thread: ProcessThread
+
+override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
+    setContentView(R.layout.activity_main)
+
+    editText = findViewById(R.id.editText)
+    textView = findViewById(R.id.textView)
+
+    val button: Button = findViewById(R.id.button)
+    button.setOnClickListener {
+        val input = editText.text.toString()
+        val message = Message.obtain()
+        message.obj = input
+
+        thread.processHandler.sendMessage(message)  // 새로 만든 스레드 안에 있는 핸들러로 메시지 전송하기
+    }
+
+    thread = ProcessThread()
+}
+
+inner class ProcessThread : Thread() {
+    val processHandler: ProcessHandler = ProcessHandler()
+
+    override fun run() {
+        Looper.prepare()
+        Looper.loop()
+    }
+
+    inner class ProcessHandler : Handler() {
+        // 새로 만든 스레드 안에서 전달받은 메시지 처리하기
+        override fun handleMessage(msg: Message) {
+            val output = "$${msg.obj} from thread."
+
+            handler.post {
+                textView.text = output
+            }
+        }
+    }
+}
+```
+
+## AsyncTask 사용하기
+
+![](./asynctask.jpg)
+
+메서드 이름 | 설명
+-|-
+doInBackground | 새로 만든 스레드에서 백그라운드 작업 수행. execute() 메소드를 호출할 때 사용된 파라미터를 배열로 전달받음
+onPreExecute | 백그라운드 작업을 수행하기 전에 호출됨. 메인 스레드에서 실행되며 초기화 작업에 사용됨.
+onProgressUpdate | 백그라운드 작업의 진행 상태를 표시하기 위해 호출됨. 작업 수행 중간 중간에 UI 객체에 접근하는 경우에 사용됩니다. 이 메서드가 호출되도록 하려면 백그라운드 작업 중간에 publishProgress() 메소드를 호출해야 함.
+onPostExecute | 백그라운드 작업이 끝난 후에 호출됨. 메인 스레드에서 실행되며 메모리 리소스를 헤제하는 등의 작업에 사용됨. 백그라운드 작업의 결과는 Result 타입의 파라미터로 전달됨.
