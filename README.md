@@ -1269,4 +1269,3 @@ class BackgroundTask : AsyncTask<Int, Int, Int>() {
 ```
 
 AsyncTask 클래스를 상속하는 부분에서 <>기호 안에 있는 세 개의 자료형은 각각 `doInBackground()`, `onProgressUpdate()`, `onPostExecute()` 메소드의 파라미터를 결정한다.
-
