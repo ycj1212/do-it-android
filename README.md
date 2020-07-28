@@ -1261,3 +1261,12 @@ doInBackground | 새로 만든 스레드에서 백그라운드 작업 수행. ex
 onPreExecute | 백그라운드 작업을 수행하기 전에 호출됨. 메인 스레드에서 실행되며 초기화 작업에 사용됨.
 onProgressUpdate | 백그라운드 작업의 진행 상태를 표시하기 위해 호출됨. 작업 수행 중간 중간에 UI 객체에 접근하는 경우에 사용됩니다. 이 메서드가 호출되도록 하려면 백그라운드 작업 중간에 publishProgress() 메소드를 호출해야 함.
 onPostExecute | 백그라운드 작업이 끝난 후에 호출됨. 메인 스레드에서 실행되며 메모리 리소스를 헤제하는 등의 작업에 사용됨. 백그라운드 작업의 결과는 Result 타입의 파라미터로 전달됨.
+
+```kt
+class BackgroundTask : AsyncTask<Int, Int, Int>() {
+    ...
+}
+```
+
+AsyncTask 클래스를 상속하는 부분에서 <>기호 안에 있는 세 개의 자료형은 각각 `doInBackground()`, `onProgressUpdate()`, `onPostExecute()` 메소드의 파라미터를 결정한다.
+
