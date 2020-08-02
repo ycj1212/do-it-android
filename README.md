@@ -1269,3 +1269,320 @@ class BackgroundTask : AsyncTask<Int, Int, Int>() {
 ```
 
 AsyncTask 클래스를 상속하는 부분에서 <>기호 안에 있는 세 개의 자료형은 각각 `doInBackground()`, `onProgressUpdate()`, `onPostExecute()` 메소드의 파라미터를 결정한다.
+
+---
+
+## 네트워킹
+
+인터넷에 연결되어 있는 원격지의 서버 또는 원격지의 단말과 통신해서 데이터를 주고받는 동작들을 포함한다.
+
+### 네트워크 연결 방식
+
+- 2-tier 방식  
+    클라이언트가 서버에 연결되어 데이터를 요청하고 응답받는 방식
+- 3-tier 방식  
+    응용 서버와 데이터 서버로 구성하면 데이터베이스를 분리할 수 있어 중간에 비지니스 로직을 처리하는 응용 서버가 다양한 역할을 할 수 있음
+- P2P  
+    서버를 두지 않고 단말끼리 서버와 클라이언트 역할을 함
+
+## 소켓 사용하기
+
+```kt
+class MainActivity : AppCompatActivity() {
+    lateinit var editText: EditText
+    lateinit var textView: TextView
+    lateinit var textView2: TextView
+    
+    private val handler = Handler()
+    private val portNumber = 5001
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        editText = findViewById(R.id.editText)
+        textView = findViewById(R.id.textView)
+        textView2 = findViewById(R.id.textView2)
+
+        val button: Button = findViewById(R.id.button)
+        button.setOnClickListener {
+            val data = editText.text.toString()
+            Thread(Runnable {
+                send(data)
+            }).start()
+        }
+
+        val button2: Button = findViewById(R.id.button2)
+        button2.setOnClickListener {
+            Thread(Runnable {
+                startServer()
+            }).start()
+        }
+    }
+
+    private fun printClientLog(data: String) {
+        Log.d("MainActivity", data)
+        handler.post {
+            textView.append("$data\n")
+        }
+    }
+
+    private fun printServerLog(data: String) {
+        Log.d("MainActivity", data)
+        handler.post {
+            textView2.append("$data\n")
+        }
+    }
+
+    private fun send(data: String) {
+        val socket = Socket("localhost", portNumber)    // 소켓 객체 생성
+        printClientLog("소켓 연결함.")
+
+        // 소켓 객체로 데이터 보내기
+        val outStream = ObjectOutputStream(socket.getOutputStream())
+        outStream.writeObject(data)
+        outStream.flush()
+        printClientLog("데이터 전송함")
+
+        val inStream = ObjectInputStream(socket.getInputStream())
+        printClientLog("서버로부터 받음: ${inStream.readObject()}")
+        socket.close()
+    }
+
+    private fun startServer() {
+        val server = ServerSocket(portNumber)   // 소켓 서버 객체 생성
+        printServerLog("서버 시작함: $portNumber")
+
+        while (true) {
+            // 클라이언트가 접속했을 때 만들어지는 소켓 객체 참조
+            val socket = server.accept()
+            val clientHost = socket.localAddress
+            val clientPort = socket.port
+            printServerLog("클라이언트 연결됨: $clientHost : $clientPort")
+
+            val inStream = ObjectInputStream(socket.getInputStream())
+            val obj = inStream.readObject()
+            printServerLog("데이터 받음: $obj")
+
+            val outStream = ObjectOutputStream(socket.getOutputStream())
+            outStream.writeObject("$obj from Server.")
+            outStream.flush()
+            printServerLog("데이터 보냄.")
+
+            socket.close()
+        }
+    }
+}
+```
+
+- 권한 추가
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+```
+
+## 웹으로 요청하기
+
+### HTTP로 웹 서버에 접속하기
+
+자바에서 HTTP 클라이언트를 만드는 가장 간단한 방법은 URL 객체를 만들고 이 객체의 openConnection() 메소드를 호출하여 HttpURLConnection 객체를 만드는 것이다.
+
+- `openConnection(): URLConnection`
+
+URL 객체에 들어 있는 문자열이 "http://"를 포함하면 HTTP 연결을 위한 객체를 만들게 되므로 HttpURLConnection으로 형변환하여 사용 가능  
+HttpURLConnection 객체로 연결할 경우 GET이나 POST와 같은 요청 방식과 함께 요청을 위한 파라미터를 설정할 수 있음
+
+- `setRequestMethod(method: String)`  
+    - GET이나 POST 문자열을 파라미터로 전달
+- `setRequestProperty(field: String, newValue: String)`
+    - 요청할 때 헤더에 들어가는 필드 값 지정할 수 있도록 한다.
+    
+## Volley 사용하기
+
+- Volley 라이브러리는 웹 요청과 응답의 단순화 목적으로 만들어진 라이브러리  
+- 요청 객체를 만들고, 요청 큐에 넣어주면 요청 큐가 알아서 웹 서버에 요청 및 응답 받음  
+- 장점: 스레드를 신경쓰지 않아도 됨
+
+- `build.gradle(Module:app)`
+
+```gradle
+...
+dependencies {
+    ...
+    implementation 'com.android.volley:volley:1.1.0'
+}
+```
+
+- `AndroidManifest.xml`
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+<application
+    ...
+    android:usesCleartextTraffic="true">
+```
+
+- `MainActivity.kt`
+
+```kt
+lateinit var requestQueue: RequestQueue
+
+class MainActivity : AppCompatActivity() {
+    lateinit var editText: EditText
+    lateinit var textView: TextView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        editText = findViewById(R.id.editText)
+        textView = findViewById(R.id.textView)
+
+        val button: Button = findViewById(R.id.button)
+        button.setOnClickListener {
+            makeRequest()
+        }
+
+        requestQueue = Volley.newRequestQueue(applicationContext)   // RequestQueue 객체 생성
+    }
+
+    private fun makeRequest() {
+        val url = editText.text.toString()
+
+        // 요청을 보내기 위한 StringRequest 객체 생성
+        val request = object : StringRequest(
+            Request.Method.GET, 
+            url,
+            Response.Listener<String> { response -> println("응답-> $response") },
+            Response.ErrorListener { error -> println("에러-> ${error?.message}") }
+            ) {
+                override fun getParams(): MutableMap<String, String> {
+                    return HashMap()
+            }
+        }
+        request.setShouldCache(false)
+        requestQueue.add(request)   // 요청 큐가 자동으로 요청과 응답 과정을 진행
+        println("요청 보냄.")
+    }
+
+    private fun println(data: String) {
+        textView.append("$data\n")
+    }
+}
+```
+
+## JSON 데이터 다루기
+
+- JSON(JavaScript Object Notation): 자바스크립트 객체 포맷을 데이터를 주고받을 때 사용할 수 있도록 문자열로 표현한 것
+
+- Gson은 JSON 문자열을 객체로 변환 가능하게 해줌
+
+```gradle
+...
+dependencies {
+    ...
+    implementation 'com.google.code.gson:gson:2.8.5'
+}
+```
+
+영화 정보 JSON
+
+```json
+{
+	"boxOfficeResult": {
+		"boxofficeType": "일별 박스오피스",
+		"showRange": "20120101~20120101",
+		"dailyBoxOfficeList": [{
+			"rnum": "1",
+			"rank": "1",
+			"rankInten": "0",
+			"rankOldAndNew": "OLD",
+			"movieCd": "20112207",
+			"movieNm": "미션임파서블:고스트프로토콜",
+			"openDt": "2011-12-15",
+			"salesAmt": "2776060500",
+			"salesShare": "36.3",
+			"salesInten": "-415699000",
+			"salesChange": "-13",
+			"salesAcc": "40541108500",
+			"audiCnt": "353274",
+			"audiInten": "-60106",
+			"audiChange": "-14.5",
+			"audiAcc": "5328435",
+			"scrnCnt": "697",
+			"showCnt": "3223"
+		}, {
+			"rnum": "2",
+			"rank": "2",
+			"rankInten": "1",
+			"rankOldAndNew": "OLD",
+			"movieCd": "20110295",
+			"movieNm": "마이 웨이",
+			"openDt": "2011-12-21",
+			"salesAmt": "1189058500",
+			"salesShare": "15.6",
+			"salesInten": "-105894500",
+			"salesChange": "-8.2",
+			"salesAcc": "13002897500",
+			"audiCnt": "153501",
+			"audiInten": "-16465",
+			"audiChange": "-9.7",
+			"audiAcc": "1739543",
+			"scrnCnt": "588",
+			"showCnt": "2321"
+		}]
+	}
+}
+```
+
+JSON 문자열을 자바 객체로 변환하기 위해 클래스를 새로 정의해야함  
+변수의 이름은 JSON 문자열에서 속성의 이름과 같아야함
+
+```kt
+class MovieList {
+    lateinit var boxOfficeResult: MovieListResult
+}
+```
+
+```kt
+class MovieListResult {
+    lateinit var boxofficeType: String
+    lateinit var showRange: String
+
+    val dailyBoxOfficeList = ArrayList<Movie>()
+}
+```
+
+```kt
+class Movie {
+    lateinit var rnum: String
+    lateinit var rank: String
+    lateinit var rankInten: String
+    lateinit var rankOldAndNew: String
+    lateinit var movieCd: String
+    lateinit var movieNm: String
+    lateinit var openDt: String
+    lateinit var salesAmt: String
+    lateinit var salesShare: String
+    lateinit var salesInten: String
+    lateinit var salesChange: String
+    lateinit var salesAcc: String
+    lateinit var audiCnt: String
+    lateinit var audiInten: String
+    lateinit var audiChange: String
+    lateinit var audiAcc: String
+    lateinit var scrnCnt: String
+    lateinit var showCnt: String
+}
+```
+
+Gson을 이용해 JSON 변환
+
+```kt
+private fun processResponse(response: String) {
+    val gson = Gson()
+    val movieList = gson.fromJson(response, MovieList::class.java)  // JSON 문자열을 MovieList 객체로 변환하기
+
+    println("영화 정보 수: ${movieList.boxOfficeResult.dailyBoxOfficeList.size}")
+}
+```
