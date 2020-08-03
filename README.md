@@ -1396,7 +1396,64 @@ HttpURLConnection 객체로 연결할 경우 GET이나 POST와 같은 요청 방
     - GET이나 POST 문자열을 파라미터로 전달
 - `setRequestProperty(field: String, newValue: String)`
     - 요청할 때 헤더에 들어가는 필드 값 지정할 수 있도록 한다.
-    
+
+```kt
+class MainActivity : AppCompatActivity() {
+    lateinit var editText: EditText
+    lateinit var textView: TextView
+
+    private val handler = Handler()
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        editText = findViewById(R.id.editText)
+        textView = findViewById(R.id.textView)
+
+        val button: Button = findViewById(R.id.button)
+        button.setOnClickListener {
+            val urlStr = editText.text.toString()
+            Thread(Runnable {
+                request(urlStr)
+            }).start()
+        }
+    }
+
+    private fun request(urlStr: String) {
+        val output = StringBuilder()
+        val url = URL(urlStr)
+        val conn = url.openConnection() as HttpURLConnection
+
+        conn.connectTimeout = 10000 // 연결 대기 시간(10초)
+        conn.requestMethod = "GET"
+        conn.doInput = true // 객체의 입력이 가능하도록 만듬
+
+        val resCode = conn.responseCode
+        val reader = BufferedReader(InputStreamReader(conn.inputStream))
+        var line: String? = null
+        while (true) {
+            line = reader.readLine()
+            if (line == null) {
+                break
+            }
+
+            output.append("$line\n")
+        }
+        reader.close()
+        conn.disconnect()
+
+        println("응답-> $output")
+    }
+
+    private fun println(str: String) {
+        handler.post {
+            textView.append(str)
+        }
+    }
+}
+```
+
 ## Volley 사용하기
 
 - Volley 라이브러리는 웹 요청과 응답의 단순화 목적으로 만들어진 라이브러리  

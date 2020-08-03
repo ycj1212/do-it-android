@@ -17,7 +17,6 @@ import com.google.gson.Gson
 
 class MainActivity : AppCompatActivity() {
     lateinit var editText: EditText
-    lateinit var textView: TextView
     lateinit var recyclerView: RecyclerView
     lateinit var adapter: MovieAdapter
     lateinit var requestQueue: RequestQueue
@@ -27,7 +26,6 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         editText = findViewById(R.id.editText)
-        textView = findViewById(R.id.textView)
         recyclerView = findViewById(R.id.recyclerView)
 
         val layoutManager = LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false)
