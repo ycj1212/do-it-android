@@ -1643,3 +1643,25 @@ private fun processResponse(response: String) {
     println("영화 정보 수: ${movieList.boxOfficeResult.dailyBoxOfficeList.size}")
 }
 ```
+
+---
+
+## 모바일 데이터베이스
+
+- SharedPreferences
+- SQLite
+
+
+### 데이터베이스 활용 순서
+
+데이터베이스 만들기 -> 테이블 만들기 -> 레코드 추가하기 -> 데이터 조회하기
+
+## 데이터베이스와 테이블 만들기
+
+- Context 클래스
+    - `openOrCreateDatabase(name: String, mode: Int, factory: SQLiteDatabase.CursorFactory): SQLiteDatabase`
+
+    - `deleteDatabase(name: String)`
+
+- SQLiteDatabase 객체
+    - `execSQL(sql: String)`
