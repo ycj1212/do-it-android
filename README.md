@@ -1665,3 +1665,109 @@ private fun processResponse(response: String) {
 
 - SQLiteDatabase 객체
     - `execSQL(sql: String)`
+
+## 헬퍼 클래스로 업그레이드 지원하기
+
+스키마: 테이블의 구조를 정의한 것  
+테이블의 정의가 바뀌어서 스키마를 업그레이드 할 필요가 있을 때 헬퍼 클래스 사용 가능
+
+- SQLiteOpenHelper 클래스
+    - `SQLiteOpenHelper(context: Context, name: String, factory: SQLiteDatabase.CursorFactory, version: Int)`
+
+    - 데이터베이스 파일 생성
+        - `getReadableDatabase()`
+        - `getWritableDatabase()`
+
+    - `onCreate(db: SQLiteDatabase)`
+
+    - `onOpen(db: SQLiteDatabase)`
+
+    - `onUpgrade(db: SQLiteDatabase, oldVersion: Int, newVersion: Int)`
+        - `oldVersion: Int` = 기존 버전 정보
+        - `newVersion: Int` = 현재 버전 정보
+
+## 데이터 조회하기
+
+- SQLiteDatabase
+    - `fun rawQuery(sql: String, selectionArgs: StringArray): Cursor`
+
+- Cursor
+    - `getCount()` = 전체 레코드 개수
+    
+    - `moveToNext()` = 다음 레코드
+    
+    - 값 참조
+        - `getString(): String`
+        - `getShort(): Short`
+        - `getInt(): Int`
+        - ...
+
+    - 사용 후 `close()` 호출 하여 닫아야함
+
+### 정리
+
+순서 | 내용 | 사용 메소드
+-|-|-
+데이터베이스 만들기 | 데이터베이스를 만들면 SQLiteDatabase 객체가 반환됨 | openOrCreateDatabase()
+테이블 만들기 | 'CREATE TABLE ...' SQL을 정의한 후 실행함 | execSQL()
+레코드 추가하기 | 'INSERT INTO ...' SQL을 정의한 후 실행함 | execSQL()
+데이터 조회하기 | 'SELECT FROM ...' SQL을 정의한 후 실행함. Cursor 객체가 반환되며 Cursor를 통해 확인한 레코드를 리스트 뷰 등에 표시함 | rawQuery()
+
+## 내용 제공자 이해하기
+
+내용 제공자(Content Provider): 한 앱에서 관리하는 데이터를 다른 앱에서도 접근 가능하게 해줌
+
+내용 제공자에서 공유할 수 있는 데이터
+- 데이터베이스
+- 파일
+- SharedPreferences
+
+CRUD: 데이터를 생성(Create), 조회(Read), 수정(Update), 삭제(Delete)하는 과정
+
+내용 제공자는 CRUD에 대응되는 insert(), query(), update(), delete() 메소드 지원
+
+내용 제공자에서 허용한 통로로 접근하려면 ContentResolver 객체 필요
+
+내용 제공자를 만들기 위해 고유한 값을 가진 content URI를 만들어야함.
+
+```
+content://org.techtown.provider/person/1
+
+content:// → 내용 제공자에 의해 제어되는 데이터라는 의미로 항상 content:// 로 시작함
+Authority → org.techtown.provider 부분을 가리키며 특정 내용 제공자를 구분하는 고유한 값
+Base Path → person 부분을 가리키며 요청할 데이터의 자료형을 결정함 (여기에서는 테이블 이름)
+ID → 맨 뒤의 1과 같은 숫자를 가리키며 요청할 데이터 레코드를 지정함
+```
+
+- `UriMatcher` 객체는 URI를 매칭하는데 사용됨.
+    - `addURI()`: URI 추가
+    - `match()`: 추가된 URI 중에서 실행 가능한 것이 있는지 확인
+
+- `ContentResolver`
+    - `getContentResolver()` 메소드를 호출하여 `ContentResolver` 객체를 반환
+    - `notifyChange()`: 레코드가 추가, 조회, 수정, 삭제되었을 때 변경이 일어났음을 알려줌.
+    
+    - `query(uri: Uri, projection: Array<String>, selection: String, selectionArgs: Array<String>, sortOrder: String): Cursor`
+        - `projection`는 조회할 칼럼들을 지정, null 일 경우 모든 칼럼 조회
+        - `selection`: SQL에서 where 절에 들어갈 조건을 지정
+        - `selectionArgs`: `selection`에 값이 있을 경우 그 안에 들어갈 조건 값을 대체하기 위해 사용
+        - `sortOrder`: 정렬 칼럼을 지정
+
+    - `insert(uri: Uri, values: ContentValues): Uri`
+        - `values`: 저장할 칼럼명과 값들이 들어간 `ContentValues` 객체
+        - 결과 값으로 새로 추가된 값의 Uri 정보 반환
+
+    - `update(uri: Uri, values: ContentValues, selection: String, selectionArgs: Array<String>): Int`
+        - `values`가 널이 되면 안됨
+        - `selection`: SQL에서 where 절에 들어갈 조건을 지정
+        - `selectionArgs`: `selection`에 값이 있을 경우 그 안에 들어갈 조건 값을 대체하기 위해 사용
+        - 결과 값으로 영향을 받은 레코드의 개수 반환
+
+    - `delete(uri: Uri, selection: String, selectionArgs: Array<String>): Int`
+        - `selection`: SQL에서 where 절에 들어갈 조건을 지정
+        - `selectionArgs`: `selection`에 값이 있을 경우 그 안에 들어갈 조건 값을 대체하기 위해 사용
+        - 결과 값으로 영향을 받은 레코드의 개수 반환
+    
+    - `getType(uri: Uri): String`
+        - MIME 타입 반환
+---
