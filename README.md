@@ -685,6 +685,35 @@ public class MainActivity extends AppCompatActivity {
 - 일정
 - 센서
 
+```kt
+val permissions: Array<String> = arrayOf(   // 위험 권한 부여할 권한 지정
+    Manifest.permission.READ_EXTERNAL_STORAGE,
+    ...
+)
+        val targetList: ArrayList<String> = ArrayList<String>()
+
+        for (i in permissions.indices) {
+            val curPermission = permissions[i]
+            val permissionCheck = ContextCompat.checkSelfPermission(this, curPermission)
+
+            if (permissionCheck == PackageManager.PERMISSION_GRANTED) {
+                Toast.makeText(this, "$curPermission 권한 있음.", Toast.LENGTH_LONG).show()
+            } else {
+                Toast.makeText(this, "$curPermission 권한 없음.", Toast.LENGTH_LONG).show()
+                if (ActivityCompat.shouldShowRequestPermissionRationale(this, curPermission)) {
+                    Toast.makeText(this, "$curPermission 권한 설명 필요함.", Toast.LENGTH_LONG).show()
+                } else {
+                    targetList.add(curPermission)
+                }
+            }
+        }
+
+        val targets: Array<String> = Array(targetList.size) { "" }
+        targetList.toArray(targets)
+
+        ActivityCompat.requestPermissions(this, targets, 101)   // 위험 권한 부여 요청
+```
+
 ## 리소스(Resource)
 
 /app/assets  
