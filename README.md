@@ -1680,7 +1680,6 @@ private fun processResponse(response: String) {
 - SharedPreferences
 - SQLite
 
-
 ### 데이터베이스 활용 순서
 
 데이터베이스 만들기 -> 테이블 만들기 -> 레코드 추가하기 -> 데이터 조회하기
