@@ -59,6 +59,7 @@ class MainActivity : AppCompatActivity() {
         values.put("age", 20)
         values.put("mobile", "010-1000-1000")
 
+
         uri = contentResolver.insert(uri, values)
         println("insert 결과 -> ${uri.toString()}")
     }
