@@ -17,7 +17,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_gravity="top"
-            android:elevation="1dp"/>
+            android:elevation="1dp"
+            app:tabGravity="fill"
+            app:tabMode="fixed"
+            app:tabSelectedTextColor="@color/colorAccent"
+            app:tabTextColor="@color/colorPrimary"/>
 
     </androidx.viewpager.widget.ViewPager>
 
