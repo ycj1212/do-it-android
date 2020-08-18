@@ -6,15 +6,14 @@ import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 
-class Book(var title: String, var author: String, var contents: String)
 class BookAdapter : RecyclerView.Adapter<BookAdapter.ViewHolder>() {
-    var items = ArrayList<Book>()
+    var items = ArrayList<BookInfo>()
 
     class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
         var textView: TextView = itemView.findViewById(R.id.textview)
         var textView2: TextView = itemView.findViewById(R.id.textview2)
 
-        fun setItem(item: Book) {
+        fun setItem(item: BookInfo) {
             textView.text = item.title
             textView2.text = item.author
         }
@@ -34,7 +33,7 @@ class BookAdapter : RecyclerView.Adapter<BookAdapter.ViewHolder>() {
         holder.setItem(item)
     }
 
-    fun addItem(item: Book) {
+    fun addItem(item: BookInfo) {
         items.add(item)
     }
 }

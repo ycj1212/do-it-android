@@ -1,5 +1,6 @@
 package com.example.doitmission22
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,6 +14,13 @@ class Fragment1() : Fragment() {
     private lateinit var edittext: EditText
     private lateinit var edittext2: EditText
     private lateinit var edittext3: EditText
+    private lateinit var callback: OnDatabaseCallback
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        callback = activity as OnDatabaseCallback
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -31,7 +39,7 @@ class Fragment1() : Fragment() {
             val author = edittext2.text.toString()
             val contents = edittext3.text.toString()
 
-            // 데이터베이스에 저장
+            callback.insert(title, author, contents)
 
             Toast.makeText(view.context, "저장완료", Toast.LENGTH_SHORT).show()
         }

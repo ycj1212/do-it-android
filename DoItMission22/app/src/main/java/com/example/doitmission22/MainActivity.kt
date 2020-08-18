@@ -2,15 +2,15 @@ package com.example.doitmission22
 
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.widget.Button
-import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.ViewPager
 import com.google.android.material.tabs.TabLayout
 
-class MainActivity : AppCompatActivity() {
+var database: BookDatabase? = null
+
+class MainActivity : AppCompatActivity(), OnDatabaseCallback {
     private lateinit var tabLayout: TabLayout
     private lateinit var viewPager: ViewPager
 
@@ -32,7 +32,29 @@ class MainActivity : AppCompatActivity() {
         tabLayout.addTab(tabLayout.newTab())
         tabLayout.addTab(tabLayout.newTab())
         tabLayout.setupWithViewPager(viewPager)
+
+        if (database != null) {
+            database?.close()
+            database = null
+        }
+
+        database = BookDatabase.getInstance(this)
+        database?.open()
     }
+
+    override fun onDestroy() {
+        if (database != null) {
+            database?.close()
+            database = null
+        }
+        super.onDestroy()
+    }
+
+    override fun insert(title: String, author: String, contents: String) {
+        database?.insertRecord(title, author, contents)
+    }
+
+    override fun selectAll(): ArrayList<BookInfo> = database!!.selectAll()
 
     inner class ViewPagerAdapter(fm: FragmentManager) : FragmentStatePagerAdapter(fm) {
         private val items = ArrayList<Fragment>()

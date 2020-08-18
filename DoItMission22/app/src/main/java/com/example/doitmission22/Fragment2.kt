@@ -1,16 +1,25 @@
 package com.example.doitmission22
 
+import android.content.Context
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 class Fragment2() : Fragment() {
-    lateinit var recyclerView: RecyclerView
-    lateinit var adapter: BookAdapter
+    private lateinit var recyclerView: RecyclerView
+    private lateinit var adapter: BookAdapter
+    private lateinit var callback: OnDatabaseCallback
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+
+        callback = activity as OnDatabaseCallback
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -27,8 +36,10 @@ class Fragment2() : Fragment() {
         adapter = BookAdapter()
         recyclerView.adapter = adapter
 
-        // 데이터베이스에서 불러와 adapter에 전달
+        val result = callback.selectAll()
+        adapter.items = result
+        adapter.notifyDataSetChanged()
 
-       return view
+        return view
     }
 }

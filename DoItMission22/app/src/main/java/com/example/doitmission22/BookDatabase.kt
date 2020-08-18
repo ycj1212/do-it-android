@@ -8,7 +8,7 @@ const val DATABASE_NAME = "book.db"
 const val TABLE_NAME = "BOOK_INFO"
 const val DATABASE_VERSION = 1
 
-class BookInfo(var name: String, var author: String, var contents: String)
+class BookInfo(var title: String, var author: String, var contents: String)
 class BookDatabase private constructor(private val context: Context) {
     companion object {
         private var instance: BookDatabase? = null
@@ -37,7 +37,7 @@ class BookDatabase private constructor(private val context: Context) {
             db?.execSQL("DROP TABLE IF EXISTS $TABLE_NAME")
             db?.execSQL("CREATE TABLE $TABLE_NAME (" +
                     " _id INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT, " +
-                    " name TEXT, " +
+                    " title TEXT, " +
                     " author TEXT, " +
                     " contents TEXT, " +
                     " CREATE_DATE TIMESTAMP DEFAULT CURRENT_TIMESTAMP " +
@@ -52,23 +52,27 @@ class BookDatabase private constructor(private val context: Context) {
 
         override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {}
 
-        private fun insertRecord(db: SQLiteDatabase, name: String, author: String, contents: String) {
-            db.execSQL("INSERT INTO $TABLE_NAME (name, author, contents) values ( '$name', '$author', '$contents' );")
+        private fun insertRecord(db: SQLiteDatabase, title: String, author: String, contents: String) {
+            db.execSQL("INSERT INTO $TABLE_NAME (title, author, contents) values ( '$title', '$author', '$contents' );")
+        }
+    }
+
+    fun insertRecord(title: String, author: String, contents: String) {
+        db.execSQL("INSERT INTO $TABLE_NAME (title, author, contents) values ( '$title', '$author', '$contents' );")
+    }
+
+    fun selectAll(): ArrayList<BookInfo> {
+        val result = ArrayList<BookInfo>()
+        val cursor = db.rawQuery("SELECT title, author, contents from $TABLE_NAME", null)
+        for (i in 0 until cursor.count) {
+            cursor.moveToNext()
+            val title = cursor.getString(0)
+            val author = cursor.getString(1)
+            val contents = cursor.getString(2)
+
+            result.add(BookInfo(title, author, contents))
         }
 
-        fun selectAll(): ArrayList<BookInfo> {
-            val result = ArrayList<BookInfo>()
-            val cursor = db.rawQuery("SELECT name, author, contents from $TABLE_NAME", null)
-            for (i in 0 until cursor.count) {
-                cursor.moveToNext()
-                val name = cursor.getString(0)
-                val author = cursor.getString(1)
-                val contents = cursor.getString(2)
-
-                result.add(BookInfo(name, author, contents))
-            }
-
-            return result
-        }
+        return result
     }
 }
