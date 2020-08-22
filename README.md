@@ -1804,7 +1804,7 @@ ID → 맨 뒤의 1과 같은 숫자를 가리키며 요청할 데이터 레코�
 
 ## 뷰에 그래픽 그리기
 
-- 뷰 화면에 빨간색 사각형을 그리는 단계
+### 뷰 화면에 빨간색 사각형을 그리는 단계
 
 1. 뷰를 상속받은 새로운 클래스 생성
 2. 페인트 객체 초기화 후 필요한 속성 설정
@@ -1820,4 +1820,45 @@ ID → 맨 뒤의 1과 같은 숫자를 가리키며 요청할 데이터 레코�
 페인트(Paint) | 그래픽 그리기를 위해 필요한 색상 등의 속성을 담고 있음
 비트맵(Bitmap) | 픽셀로 구성된 이미지로 메모리에 그래픽을 그리는 데 사용합니다.
 드로어블 객체(Drawable) | 사각형, 이미지 등의 그래픽 요소가 객체로 정의되어 있습니다.
+
+### 선 그리기 속성
+
+구분 | 설명
+-|-
+setStrokeWidth | Stroke의 폭 설정
+setStrokeCap | Stroke의 시작과 끝 부분의 모양 설정
+setStrokeJoin | Stroke의 꼭짓점 부분에 사용되는 연결 모양 설정
+setStrokeMiter | Stroke 폭의 절반에 대한 Miter 길이의 비율 제한을 설정
+
+## 비트맵 이미지 사용하기
+
+비트맵(Bitmap) 객체: 메모리에 만들어지는 이미지
+
+더블 버퍼링(Double Buffering): 별도의 메모리 공간에 미리 그래픽을 그린 후 뷰가 다시 그려져야 할 필요가 있을 때 미리 그려놓은 비트맵을 화면에 표시하는 방법
+
+### BitmapFactory 클래스
+
+비트맵 이미지를 만들기 위한 클래스 메소드를 제공하며 이 메소드들은 이미지를 비트맵 객체로 만들어줄 수 있는 방법을 제공
+
+- 파일에서 읽기
+    - `decodeFile(pathName: String): Bitmap`
+- 리소스에서 읽기
+    - `decodeResource(res: Resources, id: Int): Bitmap`
+- 바이트 배열에서 읽기
+    - `decodeByteArray(data: ByteArray, offset: Int, length: Int)`
+- 스트림에서 읽기
+    - `decodeStream(is: InputStream)`
+
+### Matrix 클래스
+
+이미지를 다른 형태로 바꾸기 위해 사용
+
+- `setScale()`: 확대/축소
+- `setTranslate()`: 이동
+- `setRotate()`: 회전
+- `setSkew()`: 뒤틀림
+
+이미지에 다양한 효과를 내는 데 마스크(Mask) 사용
+
+## 페인트보드 만들기
 
