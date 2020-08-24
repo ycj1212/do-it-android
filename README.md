@@ -1836,7 +1836,7 @@ setStrokeMiter | Stroke 폭의 절반에 대한 Miter 길이의 비율 제한을
 
 더블 버퍼링(Double Buffering): 별도의 메모리 공간에 미리 그래픽을 그린 후 뷰가 다시 그려져야 할 필요가 있을 때 미리 그려놓은 비트맵을 화면에 표시하는 방법
 
-### BitmapFactory 클래스
+### - BitmapFactory 클래스
 
 비트맵 이미지를 만들기 위한 클래스 메소드를 제공하며 이 메소드들은 이미지를 비트맵 객체로 만들어줄 수 있는 방법을 제공
 
@@ -1849,7 +1849,7 @@ setStrokeMiter | Stroke 폭의 절반에 대한 Miter 길이의 비율 제한을
 - 스트림에서 읽기
     - `decodeStream(is: InputStream)`
 
-### Matrix 클래스
+### - Matrix 클래스
 
 이미지를 다른 형태로 바꾸기 위해 사용
 
@@ -1862,3 +1862,42 @@ setStrokeMiter | Stroke 폭의 절반에 대한 Miter 길이의 비율 제한을
 
 ## 페인트보드 만들기
 
+onTouchEvent() 메소드 사용
+
+```kotlin
+class BestPaintBoard(context: Context, attrs: AttributeSet? = null) : View(context, attrs) {
+    // ...
+    override fun onTouchEvent(event: MotionEvent?): Boolean {
+        val action = event!!.action
+        val X = event.x.toInt()
+        val Y = event.y.toInt()
+
+        when (action) {
+            MotionEvent.ACTION_UP -> {      // 손가락을 뗐을 때
+                lastX = -1
+                lastY = -1
+            }
+            MotionEvent.ACTION_DOWN -> {    // 손가락으로 눌렀을 때
+                if (lastX != -1) {
+                    if (X != lastX || Y != lastY) {
+                        mCanvas.drawLine(lastX.toFloat(), lastY.toFloat(), X.toFloat(), Y.toFloat(), mPaint)
+                    }
+                }
+                lastX = X
+                lastY = Y
+            }
+            MotionEvent.ACTION_MOVE -> {    // 손가락을 움직일 때
+                if (lastX != -1) {
+                    mCanvas.drawLine(lastX.toFloat(), lastY.toFloat(), X.toFloat(), Y.toFloat(), mPaint)
+                }
+                lastX = X
+                lastY = Y
+            }
+        }
+
+        invalidate()
+
+        return true
+    }
+}
+```
