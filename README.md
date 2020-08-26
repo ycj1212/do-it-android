@@ -1901,3 +1901,32 @@ class BestPaintBoard(context: Context, attrs: AttributeSet? = null) : View(conte
     }
 }
 ```
+
+## 멀티터치 이미지 뷰어 만들기
+
+`getPointerCount()`  
+: 터치된 손가락 개수를 반환
+
+`getX(pointerIndex: Int)`  
+`getY(pointerIndex: Int)`  
+: 손가락 인덱스의 값으로 좌표 값 반환
+
+- `pointerIndex`
+    - 0: 첫 번째 손가락  
+    - 1: 두 번째 손가락
+
+### Matrix 객체  
+: 이미지의 크기를 확대 및 축소하거나 이미지를 이동하기 위해 사용
+
+- `postScale(sx: Float, sy, Float, px: Float, py: Float): Boolean`
+    - 비트맵 이미지 확대 및 축소
+    - `sx`: X축을 기준으로 확대하는 비율
+    - `sy`: Y축을 기준으로 확대하는 비율
+    - `px`, `py`: 확대 및 축소할 때 기준이 되는 위치, 일반적으로 비트맵 이미지의 중심점을 지정
+- `postTranslate(dx: Float, dy: Float): Boolean`
+    - 비트맵 이미지 이동
+    - `dx`, `dy`: 이동할 만큼의 X와 Y 좌표 값
+- `postRotate(degrees: Float): Boolean`
+    - 비트맵 이미지 회전
+    - `degrees`: 회전 각도
+
