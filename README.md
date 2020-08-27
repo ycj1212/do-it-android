@@ -1930,3 +1930,135 @@ class BestPaintBoard(context: Context, attrs: AttributeSet? = null) : View(conte
     - 비트맵 이미지 회전
     - `degrees`: 회전 각도
 
+
+## 카메라로 사진 찍어 저장하기
+
+카메라로 사진을 찍기 위해 사용되는 방법  
+1. 인텐트로 단말의 카메라 앱을 실행한 후 결과 사진을 받아 처리
+2. 앱 화면에 카메라 미리보기를 보여주고 직접 사진을 찍어 처리
+
+```kt
+class MainActivity : AppCompatActivity(), AutoPermissionsListener {
+    lateinit var imageView: ImageView
+    var file: File? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        imageView = findViewById(R.id.imageView)
+
+        val button: Button = findViewById(R.id.button)
+        button.setOnClickListener {
+            takePicture()
+        }
+
+        AutoPermissions.Companion.loadAllPermissions(this, 101)
+    }
+
+    private fun takePicture() {
+        if (file == null) {
+            file = createFile()
+        }
+
+        // File 객체로부터 Uri 객체 만들기
+        val fileUri = FileProvider.getUriForFile(this, "com.example.samplecaptureintent.fileprovider", file!!)
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        intent.putExtra(MediaStore.EXTRA_OUTPUT, fileUri)
+        if (intent.resolveActivity(packageManager) != null) {
+            startActivityForResult(intent, 101) // 사진 찍기 화면 띄우기
+        }
+    }
+
+    // 카메라 앱에서 사진을 찍은 후에 그 결과물을 저장할 파일 생성
+    private fun createFile(): File {
+        val fileName = "capture.jpg"
+        val storageDir = Environment.getExternalStorageDirectory()
+        val outFile = File(storageDir, fileName)
+
+        return outFile
+    }
+
+    // 카메라 앱에서 찍은 사진을 파일에서 확인하여 이미지뷰에 설정
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        if (requestCode == 101 && resultCode == RESULT_OK) {
+            val options: BitmapFactory.Options = BitmapFactory.Options()    // 이미지 파일을 Bitmap 객체로 만들기
+            options.inSampleSize = 8    // 1/8 크기로 축소
+            val bitmap = BitmapFactory.decodeFile(file?.absolutePath, options)
+
+            imageView.setImageBitmap(bitmap)
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        AutoPermissions.Companion.parsePermissions(this, requestCode,
+            permissions as Array<String>, this)
+    }
+
+    override fun onDenied(requestCode: Int, permissions: Array<String>) {
+        Toast.makeText(this, "permissions denied : ${permissions.size}", Toast.LENGTH_LONG).show()
+    }
+
+    override fun onGranted(requestCode: Int, permissions: Array<String>) {
+        Toast.makeText(this, "permissions granted : ${permissions.size}", Toast.LENGTH_LONG).show()
+    }
+}
+```
+
+`createFile()`로 생성된 파일을 카메라 앱이 사용할 때는 다른 앱에서 파일을 공유해야 하므로 내용 제공자(Content Provider)를 만들어 해당 폴더를 공유할 수 있게 해야 한다.
+
+- app/res/xml/external.xml
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<paths xmlns:android="http://schemas.android.com/apk/res/android">
+    <external-path
+        name="sdcard"
+        path="." />
+</paths>
+```
+
+- AndroidManifest.xml
+
+```xml
+...
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+
+<uses-feature
+    android:name="android.hardware.camera"
+    android:required="true"/>
+...
+</activity>
+<provider
+    android:authorities="com.example.samplecaptureintent.fileprovider"
+    android:name="androidx.core.content.FileProvider"
+    android:exported="false"
+    android:grantUriPermissions="true">
+    <meta-data
+        android:name="android.support.FILE_PROVIDER_PATHS"
+        android:resource="@xml/external" />
+</provider>
+```
+
+```gradle
+...
+allprojects {
+    repositories {
+        maven { url 'https://jitpack.io' }
+    }
+}
+
+dependencies {
+    ...
+    implementation 'com.github.pedroSG94:AutoPermissions:1.0.3'
+}
+```
