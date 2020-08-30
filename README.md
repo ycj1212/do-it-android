@@ -2062,3 +2062,16 @@ dependencies {
     implementation 'com.github.pedroSG94:AutoPermissions:1.0.3'
 }
 ```
+
+## 화면에 카메라 미리보기 넣기
+
+카메라 미리보기를 위한 서피스뷰 사용
+
+![](./surfaceview.png)
+
+서피스 뷰는 서피스홀더(SurfaceHolder) 객체에 의해 생성되고 제어됨
+
+### SurfaceHolder
+
+- `setPreviewDisplay(sv: Surface)`
+    - 
