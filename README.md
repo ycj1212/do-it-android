@@ -1930,6 +1930,7 @@ class BestPaintBoard(context: Context, attrs: AttributeSet? = null) : View(conte
     - 비트맵 이미지 회전
     - `degrees`: 회전 각도
 
+---
 
 ## 카메라로 사진 찍어 저장하기
 
@@ -2074,4 +2075,64 @@ dependencies {
 ### SurfaceHolder
 
 - `setPreviewDisplay(sv: Surface)`
-    - 
+    - 미리보기 설정(미리보기 화면을 서피스뷰에 보여주기 위해)
+
+카메라 객체의 startPreview() 메소드 호출
+
+타입 SURFACE_TYPE_PUSH_BUFFERS
+
+그래픽 그리기 제한
+
+뷰를 중첩시켜 사용
+
+카메라 미리보기를 한 후 화면의 버튼을 눌러 사진을 찍고 미디어 앨범에 저장하는 앱
+
+
+### Camera.PictureCallback
+
+- `onPictureTaken(data: ByteArray, camera: Camera)`
+    - 사진을 찍을 때 자동으로 호출되는 메소드로 캡처된 이미지 데이터가 전달됨
+
+BitmapFactory 클래스에 정의된 `decodeByteArray()` 메소드를 사용하여 <u>이미지 데이터를 비트맵으로 생성</u>
+
+### MediaStore.Images.Media
+
+- `insertImage(cr: ContentResolver, source: Bitmap, title: String, description: String): String`
+    - 이미지를 미디어 앨범에 추가
+
+CAMERA와 SD카드 접근 권한 추가
+
+```xml
+<uses-permission android:name="android.permission.CAMERA"/>
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+
+<uses-feature
+    android:name="android.hardware.camera2"
+    android:required="true"/>
+```
+
+---
+
+## 음악 파일 재생하기
+
+### MediaPlayer 클래스
+
+- 오디오 재생, 동영상 재생 담당
+- 출시되는 단말에 따라 지원하는 코덱이 다르므로 재생할 수 있는 파일의 종류가 다를 수 있음
+
+오디오 파일 재생 시 대상 지정 방법
+
+1. 인터넷에 있는 파일 위치 지정
+    - 미디어가 있는 위치를 URL로 지정
+2. 프로젝트 파일에 포함한 후 위치 지정
+    - 앱을 개발하여 배포하는 과정에서 프로젝트의 리소스 또는 애셋(assets) 폴더에 넣은 후 그 위치를 지정
+3. 단말 SD 카드에 넣은 후 위치 지정
+    - 단말에 넣어 둔 SD 카드에 파일을 넣은 후 그 위치를 지정
+
+미디어플레이어로 음악 파일을 재생하는 과정
+
+1. `setDataSource()` - 대상 파일을 알려주는 것으로 URL 지정
+2. `prepare()` - 재생을 준비(대상 파일의 몇 프레임을 미리 읽어 들이고 정보 확인)
+3. `start()` - 음악 파일 재생
+

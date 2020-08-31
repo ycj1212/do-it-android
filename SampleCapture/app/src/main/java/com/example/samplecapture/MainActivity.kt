@@ -39,8 +39,8 @@ class MainActivity : AppCompatActivity(), AutoPermissionsListener {
 
     private fun takePicture() {
         cameraView.capture(Camera.PictureCallback { data, camera ->
-            val bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
-            val outUriStr = MediaStore.Images.Media.insertImage(contentResolver, bitmap, "Captured Image", "Captured Image using Camera.")  // 전달받은 바이트 배열을 Bitmap 객체로 만들기
+            val bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)  // 전달받은 바이트 배열을 Bitmap 객체로 만들기
+            val outUriStr = MediaStore.Images.Media.insertImage(contentResolver, bitmap, "Captured Image", "Captured Image using Camera.")
             if (outUriStr == null) {
                 return@PictureCallback
             } else {
@@ -57,6 +57,7 @@ class MainActivity : AppCompatActivity(), AutoPermissionsListener {
 
         init {
             mHolder = holder
+            //mHolder.setType(SurfaceHolder.SURFACE_TYPE_PUSH_BUFFERS)
             mHolder.addCallback(this)
         }
 
