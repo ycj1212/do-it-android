@@ -2136,3 +2136,16 @@ CAMERA와 SD카드 접근 권한 추가
 2. `prepare()` - 재생을 준비(대상 파일의 몇 프레임을 미리 읽어 들이고 정보 확인)
 3. `start()` - 음악 파일 재생
 
+
+
+## 동영상 재생하기
+
+VideoView
+
+## 오디오 녹음하여 저장하기
+
+MediaRecorder
+
+## 동영상 녹화하기
+
+MediaRecorder
