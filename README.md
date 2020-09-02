@@ -2112,8 +2112,6 @@ CAMERA와 SD카드 접근 권한 추가
     android:required="true"/>
 ```
 
----
-
 ## 음악 파일 재생하기
 
 ### MediaPlayer 클래스
@@ -2136,16 +2134,75 @@ CAMERA와 SD카드 접근 권한 추가
 2. `prepare()` - 재생을 준비(대상 파일의 몇 프레임을 미리 읽어 들이고 정보 확인)
 3. `start()` - 음악 파일 재생
 
+`release()` - 리소스 해제
 
+### MediaPlayer.OnCompletionListener
+
+- `onCompletion(mp: MediaPlayer)`
+    - 재생이 중지되었을 때 호출됨
 
 ## 동영상 재생하기
 
-VideoView
+### VideoView 위젯
+
+- `setVideoURI()`
+- `setMediaController(mc: MediaController)` - VideoView에 MediaController 설정
+- `requestFocus()`
+- `start()`
 
 ## 오디오 녹음하여 저장하기
 
-MediaRecorder
+1. MediaRecorder 객체 생성
+2. 오디오 입력 및 출력 형식 설정
+3. 오디오 인코더와 파일 지정
+4. 녹음 시작
+5. 매니페스트에 권한 설정
+
+```kt
+val sdcard = Environment.getExternalStorageDirectory().absolutePath
+val filename = "$sdcard${File.separator}recorded.mp4"
+
+val recorder = MediaRecorder()
+
+recorder.setAudioSource(MediaRecorder.AudioSource.MIC)
+recorder.setOutputFormat(MediaRecorder.OutputFormat.MPEG_4)
+recorder.setAudioEncoder(MediaRecorder.AudioEncoder.DEFAULT)
+recorder.setOutputFile(filename)
+
+recorder.prepare()
+recorder.start()
+```
+
+### 녹음 끝낸 후 저장
+
+```kt
+recorder.stop()
+recorder.release()
+
+val values = ContentValues(10)
+
+values.put(MediaStore.MediaColumns.TITLE, "Recorded")
+values.put(MediaStore.Audio.Media.ALBUM, "Audio Album")
+values.put(MediaStore.Audio.Media.ARTIST, "Mike")
+values.put(MediaStore.Audio.Media.DISPLAY_NAME, "Recorded Audio")
+values.put(MediaStore.Audio.Media.IS_RINGTONE, 1)
+values.put(MediaStore.Audio.Media.IS_MUSIC, 1)
+values.put(MediaStore.MediaColumns.DATE_ADDED, System.currentTimeMillis()/1000)
+values.put(MediaStore.MediaColumns.MIME_TYPE, "audio/mp4")
+values.put(MediaStore.Audio.Media.DATA, filename)
+
+val audioUri = contentResolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_URI, values)
+```
+
+```xml
+<uses-permission android:name="android.permission.RECORD_AUDIO" />
+<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+```
 
 ## 동영상 녹화하기
 
-MediaRecorder
+영상을 녹음하기 위한 입력 소스로 카메라를 지정하여 사용자가 카메라 미리보기를 할 수 있도록 만들어 주어야 한다는 것
+
+## 유튜브 영상 재생하기
+
