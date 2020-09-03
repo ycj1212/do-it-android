@@ -2206,3 +2206,35 @@ val audioUri = contentResolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_UR
 
 ## 유튜브 영상 재생하기
 
+---
+
+## GPS로 나의 위치 확인하기
+
+위치 관리자(LocationManager)
+
+### 현재 위치 확인하는 가장 기본적인 방법
+
+1. 위치 관리자 객체 참조
+    - 위치 관리자(LocationManager)는 시스템 서비스로 제공되므로, `getSystemService()` 메소드를 이용해 위치 관리자 객체를 참조
+2. 위치 리스너 구현
+    - 위치 관리자가 알려주는 현재 위치는 위치 리스너(LocationListener)를 통해 받게 되므로 새로운 리스너를 구현하여 전달 받은 위치 정보를 처리
+3. 위치 정보 업데이트 요청
+    - 위치 관리자에게 위치 정보가 변경될 때마다 알려달라고 요청하기 위해 `requestLocationUpdates()` 메소드를 호출
+4. 매니페스트에 권한 추가
+    - GPS를 사용할 수 있도록 매니페스트 파일에 권한을 추가하고 위험권한을 위한 설정과 코드를 추가
+
+
+## 현재 위치의 지도 보여주기
+
+앱 화면 안에 지도를 넣을 수 있는 MapFragment가 제공됨
+
+- Google Play Services 라이브러리 사용 설정
+
+- XML 레이아웃에 맵 프래그먼트 추가
+
+- 소스 코드에서 내 위치로 지도 이동
+
+- 매니페스트에 설정 추가
+
+- 지도 API 키
+
