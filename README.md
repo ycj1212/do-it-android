@@ -2223,18 +2223,198 @@ val audioUri = contentResolver.insert(MediaStore.Audio.Media.EXTERNAL_CONTENT_UR
 4. 매니페스트에 권한 추가
     - GPS를 사용할 수 있도록 매니페스트 파일에 권한을 추가하고 위험권한을 위한 설정과 코드를 추가
 
+```kt
+class MainActivity : AppCompatActivity(), AutoPermissionsListener {
+    lateinit var textView: TextView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        textView = findViewById(R.id.textView)
+
+        val button: Button = findViewById(R.id.button)
+        button.setOnClickListener {
+            startLocationService()
+        }
+
+        AutoPermissions.Companion.loadAllPermissions(this, 101)
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        AutoPermissions.Companion.parsePermissions(this, requestCode, permissions as Array<String>, this)
+    }
+
+    override fun onDenied(requestCode: Int, permissions: Array<String>) {
+        Toast.makeText(this, "permissions denied : ${permissions.size}", Toast.LENGTH_LONG).show()
+    }
+
+    override fun onGranted(requestCode: Int, permissions: Array<String>) {
+        Toast.makeText(this, "permissions granted : ${permissions.size}", Toast.LENGTH_LONG).show()
+    }
+
+    private fun startLocationService() {
+        val manager = getSystemService(Context.LOCATION_SERVICE) as LocationManager // 위치 관리자 객체 참조
+
+        val location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+        if (location != null) {
+            val latitude = location.latitude
+            val longitude = location.longitude
+            val message = "최근 위치 -> Latitude : $latitude \nLongitude : $longitude"
+
+            textView.text = message
+        }
+        
+        val gpsListener = GPSListener() // 위치 리스너 객체 생성
+        val minTime = 10000L
+        val minDistance = 0F
+
+        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime, minDistance, gpsListener) // 위치 정보 업데이트 요청
+        Toast.makeText(this, "내 위치확인 요청함", Toast.LENGTH_SHORT).show()
+    }
+    
+    inner class GPSListener : LocationListener {
+        override fun onLocationChanged(location: Location?) {   // 위치가 확인되었을 때 자동으로 호출됨
+            val latitude = location?.latitude
+            val longitude = location?.longitude
+            val message = "최근 위치 -> Latitude : $latitude \nLongitude : $longitude"
+
+            textView.text = message
+        }
+
+        override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+        override fun onProviderEnabled(provider: String?) {}
+        override fun onProviderDisabled(provider: String?) {}
+    }
+}
+```
+
+- 권한 추가
+
+```xml
+<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
+```
 
 ## 현재 위치의 지도 보여주기
 
 앱 화면 안에 지도를 넣을 수 있는 MapFragment가 제공됨
 
 - Google Play Services 라이브러리 사용 설정
+    - SDK Manager -> Google Play services 설치
 
 - XML 레이아웃에 맵 프래그먼트 추가
 
+    - Google Play services 라이브러리 추가
+
+    ```gradle
+    dependencies {
+        ...
+        implementation 'com.google.android.gms:play-services-maps:17.0.0'
+    }
+    ```
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="내 위치 요청하기" />
+
+    <fragment
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        class="com.google.android.gms.maps.SupportMapFragment" />
+
+</LinearLayout>
+```
+
 - 소스 코드에서 내 위치로 지도 이동
+
+```kt
+class MainActivity : AppCompatActivity() {
+    lateinit var mapFragment: SupportMapFragment
+    lateinit var map: GoogleMap
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync {
+            map = it
+        }
+
+        MapsInitializer.initialize(this)
+
+        val button: Button = findViewById(R.id.button)
+        button.setOnClickListener {
+            startLocationService()
+        }
+    }
+
+    private fun startLocationService() {
+        val manager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+        val location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+        val gpsListener = GPSListener()
+        val minTime = 10000L
+        val minDistance = 0F
+
+        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime, minDistance, gpsListener)
+        Toast.makeText(this, "내 위치확인 요청함", Toast.LENGTH_SHORT).show()
+    }
+
+    inner class GPSListener : LocationListener {
+        override fun onLocationChanged(location: Location?) {   // 위치가 확인되었을 때 자동으로 호출됨
+            val latitude = location!!.latitude
+            val longitude = location.longitude
+
+            showCurrentLocation(latitude, longitude)
+        }
+
+        override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+        override fun onProviderEnabled(provider: String?) {}
+        override fun onProviderDisabled(provider: String?) {}
+    }
+
+    private fun showCurrentLocation(latitude: Double, longitude: Double) {
+        val curPoint = LatLng(latitude, longitude)
+        map.animateCamera(CameraUpdateFactory.newLatLngZoom(curPoint, 15f))
+    }
+}
+```
 
 - 매니페스트에 설정 추가
 
 - 지도 API 키
 
+
+
+## 지도에 아이콘 추가하기
+
+
+## 앱 위젯 만들기
+
+- 앱 위젯 호스트
+- 앱 위젯 제공자
+
+- 위젯의 초기 뷰 레이아웃
+- 앱 위젯 제공자 정보 객체
+- 앱 위젯 제공자

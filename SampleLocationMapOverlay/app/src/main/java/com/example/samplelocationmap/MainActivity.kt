@@ -13,21 +13,28 @@ import com.google.android.gms.maps.CameraUpdateFactory
 import com.google.android.gms.maps.GoogleMap
 import com.google.android.gms.maps.MapsInitializer
 import com.google.android.gms.maps.SupportMapFragment
+import com.google.android.gms.maps.model.BitmapDescriptorFactory
 import com.google.android.gms.maps.model.LatLng
+import com.google.android.gms.maps.model.MarkerOptions
 import com.pedro.library.AutoPermissions
 import com.pedro.library.AutoPermissionsListener
 
 class MainActivity : AppCompatActivity(), AutoPermissionsListener {
     lateinit var mapFragment: SupportMapFragment
-    lateinit var map: GoogleMap
+    var map: GoogleMap? = null
+
+    lateinit var myLocationMarker: MarkerOptions
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d("onCreate", "onCreate 호출됨")
+
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
         mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync {
             map = it
+            map?.isMyLocationEnabled = true
         }
 
         MapsInitializer.initialize(this)
@@ -38,6 +45,24 @@ class MainActivity : AppCompatActivity(), AutoPermissionsListener {
         }
 
         AutoPermissions.Companion.loadAllPermissions(this, 101)
+    }
+
+    override fun onResume() {
+        Log.d("onResume", "onResume 호출됨")
+        super.onResume()
+
+        if (map != null) {
+            map?.isMyLocationEnabled = true
+        }
+    }
+
+    override fun onPause() {
+        Log.d("onPause", "onPause 호출됨")
+        super.onPause()
+
+        if (map != null) {
+            map?.isMyLocationEnabled = false
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -96,6 +121,17 @@ class MainActivity : AppCompatActivity(), AutoPermissionsListener {
 
     private fun showCurrentLocation(latitude: Double, longitude: Double) {
         val curPoint = LatLng(latitude, longitude)
-        map.animateCamera(CameraUpdateFactory.newLatLngZoom(curPoint, 15f))
+        map?.animateCamera(CameraUpdateFactory.newLatLngZoom(curPoint, 15f))
+
+        showMyLocationMarker(curPoint)
+    }
+
+    private fun showMyLocationMarker(curPoint: LatLng) {
+        myLocationMarker = MarkerOptions()
+        myLocationMarker.position(curPoint)
+        myLocationMarker.title("● 내 위치\n")
+        myLocationMarker.snippet("● GPS로 확인한 위치")
+        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.mylocation))
+        map?.addMarker(myLocationMarker)
     }
 }
