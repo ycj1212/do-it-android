@@ -2403,18 +2403,219 @@ class MainActivity : AppCompatActivity() {
 
 - 매니페스트에 설정 추가
 
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.samplelocationmap">
+
+    <permission
+        android:name="org.techtown.location.permission.MAPS_RECEIVE"
+        android:protectionLevel="signature"/>
+
+    <uses-permission android:name="org.techtown.location.permission.MAPS_RECEIVE"/>
+
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <uses-permission android:name="com.google.android.providers.gsf.permission.READ_GSERVICES"/>
+
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+
+    <uses-feature android:glEsVersion="0x00020000"
+        android:required="true"/>
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme"
+        android:usesCleartextTraffic="true">
+
+        <uses-library android:name="com.google.android.maps"/>
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false"/>
+
+        <meta-data
+            android:name="com.google.android.maps.v2.API_KEY"
+            android:value="AIzaSyDlPjtGAB1elHT-DkB6Bg_wladgZH5PAf8"/>
+
+        <meta-data
+            android:name="com.google.android.gms.version"
+            android:value="@integer/google_play_services_version"/>
+
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
+```
+
 - 지도 API 키
 
-
+http://console.developers.google.com
 
 ## 지도에 아이콘 추가하기
 
+```kt
+class MainActivity : AppCompatActivity(), AutoPermissionsListener {
+    lateinit var mapFragment: SupportMapFragment
+    var map: GoogleMap? = null
+
+    lateinit var myLocationMarker: MarkerOptions
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d("onCreate", "onCreate 호출됨")
+
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        mapFragment = supportFragmentManager.findFragmentById(R.id.map) as SupportMapFragment
+        mapFragment.getMapAsync {
+            map = it
+            map?.isMyLocationEnabled = true
+        }
+
+        MapsInitializer.initialize(this)
+
+        val button: Button = findViewById(R.id.button)
+        button.setOnClickListener {
+            startLocationService()
+        }
+
+        AutoPermissions.Companion.loadAllPermissions(this, 101)
+    }
+
+    override fun onResume() {
+        Log.d("onResume", "onResume 호출됨")
+        super.onResume()
+
+        if (map != null) {
+            map?.isMyLocationEnabled = true
+        }
+    }
+
+    override fun onPause() {
+        Log.d("onPause", "onPause 호출됨")
+        super.onPause()
+
+        if (map != null) {
+            map?.isMyLocationEnabled = false
+        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+
+        AutoPermissions.Companion.parsePermissions(this, requestCode, permissions as Array<String>, this)
+    }
+
+    override fun onDenied(requestCode: Int, permissions: Array<String>) {
+        Toast.makeText(this, "permissions denied : ${permissions.size}", Toast.LENGTH_LONG).show()
+    }
+
+    override fun onGranted(requestCode: Int, permissions: Array<String>) {
+        Toast.makeText(this, "permissions granted : ${permissions.size}", Toast.LENGTH_LONG).show()
+    }
+
+    private fun startLocationService() {
+        val manager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
+
+        val location = manager.getLastKnownLocation(LocationManager.GPS_PROVIDER)
+        if (location != null) {
+            val latitude = location.latitude
+            val longitude = location.longitude
+            val message = "최근 위치 -> Latitude : $latitude \nLongitude : $longitude"
+
+            Log.d("Map", message)
+        }
+
+        val gpsListener = GPSListener()
+        val minTime = 10000L
+        val minDistance = 0F
+
+        manager.requestLocationUpdates(LocationManager.GPS_PROVIDER, minTime, minDistance, gpsListener)
+        Toast.makeText(this, "내 위치확인 요청함", Toast.LENGTH_SHORT).show()
+    }
+
+    inner class GPSListener : LocationListener {
+        override fun onLocationChanged(location: Location?) {   // 위치가 확인되었을 때 자동으로 호출됨
+            val latitude = location!!.latitude
+            val longitude = location.longitude
+            val message = "최근 위치 -> Latitude : $latitude \nLongitude : $longitude"
+
+            Log.d("Map", message)
+
+            showCurrentLocation(latitude, longitude)
+        }
+
+        override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+        override fun onProviderEnabled(provider: String?) {}
+        override fun onProviderDisabled(provider: String?) {}
+    }
+
+    private fun showCurrentLocation(latitude: Double, longitude: Double) {
+        val curPoint = LatLng(latitude, longitude)
+        map?.animateCamera(CameraUpdateFactory.newLatLngZoom(curPoint, 15f))
+
+        showMyLocationMarker(curPoint)
+    }
+
+    private fun showMyLocationMarker(curPoint: LatLng) {
+        myLocationMarker = MarkerOptions()
+        myLocationMarker.position(curPoint)
+        myLocationMarker.title("● 내 위치\n")
+        myLocationMarker.snippet("● GPS로 확인한 위치")
+        myLocationMarker.icon(BitmapDescriptorFactory.fromResource(R.drawable.mylocation))
+        map?.addMarker(myLocationMarker)    // 지도에 마커 추가
+    }
+}
+```
 
 ## 앱 위젯 만들기
 
-- 앱 위젯 호스트
-- 앱 위젯 제공자
+- 앱 위젯 호스트(App Widget Host): 위젯을 담고 있는 그릇
+- 앱 위젯 제공자(App Widget Provider): 위젯을 보여주는 제공자  
+
+즉, 앱 위젯 제공자가 앱 위젯 호스트 안에서 위젯을 보여준다...
 
 - 위젯의 초기 뷰 레이아웃
-- 앱 위젯 제공자 정보 객체
-- 앱 위젯 제공자
+    - 앱 위젯이 처음에 화면에 나타날 때 필요한 레이아웃을 정의
+- 앱 위젯 제공자 정보(App Widget Provider Info) 객체
+    - 앱 위젯을 위한 메타데이터(레이아웃, 업데이트 주기 등)를 가지고 있습니다.
+    - 앱 위젯 제공자 클래스에 대한 정보를 가지고 있습니다.
+- 앱 위젯 제공자(App Widget Provider)
+    - 앱 위젯과 정보를 주고받기 위한 기본 클래스
+    - 브로드캐스트 수신자로 만들며 앱 위젯의 상태변화에 따른 기능을 구현
+
+앱 위젯으로 보여줄 수 있는 뷰
+
+유형 | 뷰 이름
+-|-
+뷰그룹 | FrameLayout, LinearLayout, RelativeLayout
+뷰 | AnalogClock, Button, Chronometer ImageButton, ImageView, ProgressBar, TextView
+
+```xml
+<?xml version="1.0" encoding="utf-8"?>
+<appwidget-provider xmlns:android="http://schemas.android.com/apk/res/android"
+    android:minWidth="294dp"
+    android:minHeight="72dp"
+    android:updatePeriodMillis="1800000"
+    android:initialLayout="@layout/mylocation">
+</appwidget-provider>
+```
+
+- `minWidth`: 앱 위젯으로 표현될 뷰의 최소 폭
+- `minHeight`: 앱 위젯으로 표현될 뷰의 최소 높이
+- `updatePeriodMillis`: 위젯을 업데이트할 시간 간격
+- `initialLayout`: 앱 위젯으로 표현될 뷰의 레이아웃 리소스 지정
