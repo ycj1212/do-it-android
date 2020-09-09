@@ -2777,4 +2777,3 @@ class MainActivity : AppCompatActivity() {
 3. 보내려는 메시지는 애플리케이션 서버에서 클라우드에 접속한 후 전송
 4. 클라우드 서버로 전송된 메시지는 단말에 보내짐
 
-
