@@ -2619,3 +2619,162 @@ class MainActivity : AppCompatActivity(), AutoPermissionsListener {
 - `minHeight`: 앱 위젯으로 표현될 뷰의 최소 높이
 - `updatePeriodMillis`: 위젯을 업데이트할 시간 간격
 - `initialLayout`: 앱 위젯으로 표현될 뷰의 레이아웃 리소스 지정
+
+---
+
+## 푸쉬 서비스와 센서 및 단말 기능 사용하기
+
+### 진동과 소리로 알려주기
+
+- 진동
+    - `Vibrator` 시스템 서비스 객체 사용
+        - `vibrate(milliseconds: Long)` = 진동 지속 시간 지정
+        - `vibrate(vibe: VibrationEffect)` = 안드로이드 버전 26부터 사용
+
+- 소리
+    - `Ringtone` 객체 사용
+        - `play()` = API에서 제공하는 소리 재생
+    - `MediaPlayer` 객체 사용
+
+```kt
+class MainActivity : AppCompatActivity() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        val button: Button = findViewById(R.id.button01)
+        button.setOnClickListener {
+            val vibrator: Vibrator = getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+
+            if (Build.VERSION.SDK_INT >= 26) {
+                vibrator.vibrate(VibrationEffect.createOneShot(1000, 10))
+            } else {
+                vibrator.vibrate(1000)
+            }
+        }
+
+        val button2: Button = findViewById(R.id.button02)
+        button2.setOnClickListener {
+            val uri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION)
+            val ringtone = RingtoneManager.getRingtone(applicationContext, uri)
+            ringtone.play()
+        }
+
+        val button3: Button = findViewById(R.id.button03)
+        button3.setOnClickListener {
+            val player = MediaPlayer.create(applicationContext, R.raw.beep)
+            player.start()
+        }
+    }
+}
+```
+
+```xml
+<uses-permission android:name="android.permission.VIBRATE"/>
+```
+
+### 상단 알림으로 알려주기
+
+- `NotificationManager` 시스템 서비스를 이용해 알림을 화면 상단에 띄울 수 있음
+- `NotificationCompat.Builder` 객체를 이용해 `Notification` 객체 생성
+
+```kt
+const val CHANNEL_ID = "channel1"
+const val CHANNEL_NAME = "Channel1"
+
+const val CHANNEL_ID2 = "channel2"
+const val CHANNEL_NAME2 = "Channel2"
+
+class MainActivity : AppCompatActivity() {
+    lateinit var manager: NotificationManager
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        val button: Button = findViewById(R.id.button)
+        button.setOnClickListener {
+            showNoti1()
+        }
+
+        val button2: Button = findViewById(R.id.button2)
+        button2.setOnClickListener {
+            showNoti2()
+        }
+    }
+
+    fun showNoti1() {
+        manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        val builder: NotificationCompat.Builder
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            manager.createNotificationChannel(NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_DEFAULT))
+
+            builder = NotificationCompat.Builder(this, CHANNEL_ID)
+        } else {
+            builder = NotificationCompat.Builder(this)
+        }
+
+        builder.setContentTitle("간단 알림")
+        builder.setContentText("알림 메시지 입니다.")
+        builder.setSmallIcon(android.R.drawable.ic_menu_view)
+        val noti: Notification = builder.build()
+
+        manager.notify(1, noti) // 상단 알림 띄우기
+    }
+
+    fun showNoti2() {
+        manager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+
+        val builder: NotificationCompat.Builder
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            manager.createNotificationChannel(
+                NotificationChannel(
+                    CHANNEL_ID2,
+                    CHANNEL_NAME2,
+                    NotificationManager.IMPORTANCE_DEFAULT
+                )
+            )
+
+            builder = NotificationCompat.Builder(this, CHANNEL_ID2)
+        } else {
+            builder = NotificationCompat.Builder(this)
+        }
+
+        val intent = Intent(this, MainActivity::class.java)
+        val pendingIntent = PendingIntent.getActivity(this, 101, intent, PendingIntent.FLAG_UPDATE_CURRENT)
+
+        builder.setContentTitle("간단 알림")
+        builder.setContentText("알림 메시지 입니다.")
+        builder.setSmallIcon(android.R.drawable.ic_menu_view)
+        builder.setAutoCancel(true) // 알림을 클릭했을 때 자동으로 알림 표시 삭제
+        builder.setContentIntent(pendingIntent)
+        builder.setStyle(style)
+
+        val noti = builder.build()
+
+        manager.notify(2, noti)
+    }
+}
+```
+
+### 푸쉬 서비스 사용하기
+
+#### 단말로 메시지를 보내는 기술적인 방법
+
+- 단순 SMS를 이용한 알림
+    - 간단하지만 비용 발생 가능
+- 앱에서 서버에 연결을 만들어 놓은 상태에서 알림
+    - 간단하지 않음
+- 구글의 푸시 서비스(FCM)를 사용하여 알림
+    - 구글의 클라우드 서버를 사용해 메시지 전송 방식을 최적화한 서비스
+    - 앱에서 서버로 직접 연결할 필요가 없고 단말의 내부 연결을 공유하여 메시지를 수신하는 방식
+    - C2DM(Cloud To Device Messaging) -> GCM(Google Cloud Messaging) -> FCM(Firebase Cloud Messaging)
+
+#### 단말 등록 및 메시지 수신 과정
+
+1. 단말은 자신을 클라우드 서버에 등록하고 서버로부터 등록 id를 받음
+2. 등록 id는 메시지 전송을 담당할 애플리케이션 서버로 보낸 후 메시지를 기다림
+3. 보내려는 메시지는 애플리케이션 서버에서 클라우드에 접속한 후 전송
+4. 클라우드 서버로 전송된 메시지는 단말에 보내짐
+
+
