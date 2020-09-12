@@ -2777,3 +2777,256 @@ class MainActivity : AppCompatActivity() {
 3. 보내려는 메시지는 애플리케이션 서버에서 클라우드에 접속한 후 전송
 4. 클라우드 서버로 전송된 메시지는 단말에 보내짐
 
+https://console.firebase.google.com
+
+프로젝트 추가 -> Android 앱에 firebase 추가 -> 앱 등록 -> google-services.json 다운로드 -> app 폴더에 저장
+
+### SamplePush
+
+- build.gradle(Project:ProjectName)
+
+```gradle
+buildscript {
+    ...
+    dependencies {
+        ...
+        classpath 'com.google.gms:google-services:4.3.2'
+    }
+}
+```
+
+- build.gradle(Module:app)
+
+```gradle
+android {
+    ...
+    defaultConfig {
+        ...
+        minSdkVersion 16
+    }
+}
+...
+dependencies {
+    ...
+    implementation 'com.google.firebase:firebase-messaging:20.0.0'
+}
+```
+
+- MyFirebaseMessagingService.kt
+
+```kt
+const val TAG = "FMS"
+
+class MyFirebaseMessagingService : FirebaseMessagingService() {
+    // 새로운 토큰을 확인했을 때 호출
+    // token: 앱의 등록 id를 의미
+    override fun onNewToken(token: String) {
+        super.onNewToken(token)
+        Log.e(TAG, "onNewToken 호출됨: $token")
+    }
+
+    // 새로운 메시지를 받았을 때 호출
+    override fun onMessageReceived(remoteMessage: RemoteMessage) {
+        Log.d(TAG, "onMessageReceived() 호출됨.")
+
+        val from = remoteMessage.from   // 발신자 코드
+        val data = remoteMessage.data
+        val contents = data["contents"] // 발신 데이터
+
+        Log.d(TAG, "from : $from, contents : $contents")
+        sendToActivity(applicationContext, from!!, contents!!)
+    }
+
+    private fun sendToActivity(context: Context, from: String, contents: String) {
+        val intent = Intent(context, MainActivity::class.java)
+        intent.putExtra("from", from)
+        intent.putExtra("contents", contents)
+
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or
+                        Intent.FLAG_ACTIVITY_SINGLE_TOP or
+                        Intent.FLAG_ACTIVITY_CLEAR_TOP)
+        context.startActivity(intent)
+    }
+}
+```
+
+- AndroidManifest.xml
+
+```xml
+<uses-permission android:name="android.permission.INTERNET" />
+...
+<application
+    ...>
+    <service
+        android:name=".MyFirebaseMessagingService"
+        android:enabled="true"
+        android:exported="true"
+        android:stopWithTask="false">
+        <intent-filter>
+            <action android:name="com.google.firebase.MESSAGING_EVENT" />
+        </intent-filter>
+    </service>
+    ...
+```
+
+- MainActivity.kt
+
+```kt
+class MainActivity : AppCompatActivity() {
+    lateinit var textView: TextView
+    lateinit var textView2: TextView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        textView = findViewById(R.id.textView)
+        textView2 = findViewById(R.id.textView2)
+
+        // 등록 id 확인을 위한 리스너 설정
+        FirebaseInstanceId.getInstance().instanceId.addOnSuccessListener {
+            // 등록 id가 확인되면 자동으로 호출됨
+            val newToken = it.token
+
+            println("등록 id : $newToken")
+        }
+
+        val button: Button = findViewById(R.id.button)
+        button.setOnClickListener {
+            val instanceId = FirebaseInstanceId.getInstance().id    // 등록 id 값 확인을 위한 메소드 호출하기
+            println("확인된 인스턴스 id : $instanceId")
+        }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        println("onNewIntent 호출됨")
+
+        if (intent != null) {
+            processIntent(intent)
+        }
+
+        super.onNewIntent(intent)
+    }
+
+    private fun processIntent(intent: Intent) {
+        val from = intent.getStringExtra("from")
+        if (from == null) {
+            println("from is null.")
+            return
+        }
+
+        val contents = intent.getStringExtra("contents")
+
+        println("DATA : $from, $contents")
+        textView.text = "[$from]로부터 수신한 데이터 : $contents"
+    }
+
+    private fun println(data: String) {
+        textView2.append("$data\n")
+    }
+}
+```
+
+메시지 전송 앱 작성
+
+### SamplePushSend
+
+- build.gradle(Module:app)
+
+```gradle
+implementation 'com.android.volley:volley:1.1.0'
+```
+
+- MainActivity.kt
+
+```kt
+lateinit var requestQueue: RequestQueue
+lateinit var regId: String
+
+class MainActivity : AppCompatActivity() {
+    lateinit var editText: EditText
+    lateinit var textView: TextView
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        editText = findViewById(R.id.editText)
+        textView = findViewById(R.id.textView)
+
+        val button: Button = findViewById(R.id.button)
+        button.setOnClickListener {
+            val input = editText.text.toString()
+            send(input)
+        }
+
+        requestQueue = Volley.newRequestQueue(applicationContext)
+    }
+
+    fun send(input: String) {
+        val requestData = JSONObject()
+
+        requestData.put("priority", "high")
+
+        val dataObj = JSONObject()
+        dataObj.put("contents", input)
+        requestData.put("data", dataObj)
+
+        val idArray = JSONArray()
+        idArray.put(0, regId)
+        requestData.put("registration_ids", idArray)
+
+        sendData(requestData, object : SendResponseListener {
+            override fun onRequestStarted() {
+                println("onRequestStarted() 호출됨.")
+            }
+
+            override fun onRequestCompleted() {
+                println("onRequestCompleted() 호출됨.")
+            }
+
+            override fun onRequestWithError(error: VolleyError) {
+                println("onRequestWithError() 호출됨.")
+            }
+        })
+    }
+
+    interface SendResponseListener {
+        fun onRequestStarted()
+        fun onRequestCompleted()
+        fun onRequestWithError(error: VolleyError)
+    }
+
+    fun sendData(requestData: JSONObject, listener: SendResponseListener) {
+        val request = object : JsonObjectRequest(
+            Request.Method.POST,
+            "https://fcm.googleapis.com/fcm/send",
+            requestData,
+            Response.Listener<JSONObject> {
+                listener.onRequestCompleted()
+            }, Response.ErrorListener {
+                listener.onRequestWithError(it)
+            }
+        ) {
+            override fun getParams(): MutableMap<String, String> {
+                return HashMap()
+            }
+
+            override fun getHeaders(): MutableMap<String, String> {
+                val headers = HashMap<String, String>()
+                headers["Authorization"] = "key=AAAAn1oU4ZA:APA91bG1vJhykKn-WHo6vDebVZEzX0CbC0UAwBD9KNm0b6KGvd9LPwCTnGPowleQWP1PeqkrFoR6H6wkUBQqG6dMPzw_0Kulkvg0Ops7RGkLzOwWe8RxSj8d_qB4skhwywAaCI4xywdq"
+
+                return headers
+            }
+
+            override fun getBodyContentType(): String {
+                return "application/json"
+            }
+        }
+    }
+
+    fun println(data: String) {
+        textView.append("$data\n")
+    }
+}
+```
