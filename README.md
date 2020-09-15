@@ -2965,7 +2965,6 @@ class MainActivity : AppCompatActivity() {
 
     fun send(input: String) {
         val requestData = JSONObject()
-
         requestData.put("priority", "high")
 
         val dataObj = JSONObject()
@@ -3030,3 +3029,12 @@ class MainActivity : AppCompatActivity() {
     }
 }
 ```
+
+### 센서 이해하기
+
+#### 가속 센서와 방향 센서
+
+센서 매니저(SensorManager) 객체
+센서(Sensor) 객체
+SensorEvent 객체 센서로부터 정보를 받을 때 전달됨
+
