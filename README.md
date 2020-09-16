@@ -3038,3 +3038,10 @@ class MainActivity : AppCompatActivity() {
 센서(Sensor) 객체
 SensorEvent 객체 센서로부터 정보를 받을 때 전달됨
 
+### 시스템 서비스 활용하기
+
+시스템 서비스는 단말이 켜졌을 때 자동으로 실행되어 백그라운드에서 동작
+
+- ActivityManager: 액티비티나 서비스를 관리하는 시스템 서비스로 앱의 실행 상태를 알 수 있음
+- PackageManager: 앱 설치에 대한 정보를 알 수 있음
+- AlarmManager: 일정 시간에 알림을 받을 수 있도록 시스템에 등록해줌
